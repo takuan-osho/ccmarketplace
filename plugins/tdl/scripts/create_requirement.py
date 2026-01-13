@@ -159,11 +159,28 @@ def create_filename(title: str, req_id: str, prefix: str) -> str:
     return f"{prefix}-{req_id}-{title_slug}.md"
 
 
+def escape_braces(value: str) -> str:
+    """Escape braces so str.format does not treat them as placeholders."""
+    return value.replace("{", "{{").replace("}", "}}")
+
+
+def resolve_docs_dir(base_path: Path | None) -> Path:
+    """Resolve docs/ directory from an optional base path."""
+    if base_path:
+        return base_path / "docs"
+
+    docs_dir = find_docs_directory()
+    if docs_dir:
+        return docs_dir
+
+    return Path.cwd() / "docs"
+
+
 def create_requirement(
     title: str,
     req_type: str = "FR",
     category: str = "General",
-    path: Path | None = None
+    path: Path | None = None,
 ) -> None:
     """Create a new requirement file with random ID."""
     prefix = req_type.upper()
@@ -171,20 +188,15 @@ def create_requirement(
         print(f"Error: Invalid requirement type '{req_type}'. Use 'FR' or 'NFR'.")
         sys.exit(1)
 
-    type_name = "Functional Requirement" if prefix == "FR" else "Non-Functional Requirement"
-    technical_section = FR_TECHNICAL_SECTION if prefix == "FR" else NFR_TECHNICAL_SECTION
+    type_name = (
+        "Functional Requirement" if prefix == "FR" else "Non-Functional Requirement"
+    )
+    technical_section = (
+        FR_TECHNICAL_SECTION if prefix == "FR" else NFR_TECHNICAL_SECTION
+    )
 
-    # Determine requirements directory
-    if path:
-        req_dir = path / "docs" / "requirements"
-        docs_dir = path / "docs"
-    else:
-        docs_dir = find_docs_directory()
-        if docs_dir:
-            req_dir = docs_dir / "requirements"
-        else:
-            req_dir = Path.cwd() / "docs" / "requirements"
-            docs_dir = Path.cwd() / "docs"
+    docs_dir = resolve_docs_dir(path)
+    req_dir = docs_dir / "requirements"
 
     req_dir.mkdir(parents=True, exist_ok=True)
 
@@ -204,48 +216,51 @@ def create_requirement(
         sys.exit(1)
 
     # Generate content
+    safe_title = escape_braces(title)
+    safe_category = escape_braces(category)
     content = REQUIREMENT_TEMPLATE.format(
         id=f"{prefix}-{req_id}",
-        title=title,
+        title=safe_title,
         req_type=type_name,
-        category=category,
+        category=safe_category,
         date=datetime.now().strftime("%Y-%m-%d"),
-        technical_section=technical_section
+        technical_section=technical_section,
     )
 
-    filepath.write_text(content)
+    filepath.write_text(content, encoding="utf-8")
 
     print(f"Created {type_name}: {filepath}")
     print(f"ID: {prefix}-{req_id}")
-    print(f"\nNext steps:")
+    print("\nNext steps:")
     print(f"1. Edit {filepath}")
-    print(f"2. Fill in the Requirement Statement")
-    print(f"3. Define clear Acceptance Criteria")
-    print(f"4. Update Links section with related documents")
-    print(f"5. Update status when approved (Proposed -> Accepted)")
+    print("2. Fill in the Requirement Statement")
+    print("3. Define clear Acceptance Criteria")
+    print("4. Update Links section with related documents")
+    print("5. Update status when approved (Proposed -> Accepted)")
 
 
 def main():
     """Main execution function."""
-    parser = argparse.ArgumentParser(
-        description="Create a new Requirement document"
-    )
+    parser = argparse.ArgumentParser(description="Create a new Requirement document")
     parser.add_argument("title", help="Title of the requirement")
     parser.add_argument(
-        "--type", "-t",
+        "--type",
+        "-t",
         choices=["FR", "NFR"],
         default="FR",
-        help="Requirement type: FR (Functional) or NFR (Non-Functional)"
+        help="Requirement type: FR (Functional) or NFR (Non-Functional)",
     )
     parser.add_argument(
-        "--category", "-c",
+        "--category",
+        "-c",
         default="General",
-        help="Category (e.g., Performance, Security, Usability)"
+        help="Category (e.g., Performance, Security, Usability)",
     )
     parser.add_argument(
-        "--path", "-p",
+        "--path",
+        "-p",
         type=Path,
-        help="Base path for the project (default: current directory)"
+        help="Base path for the project (default: current directory)",
     )
 
     args = parser.parse_args()

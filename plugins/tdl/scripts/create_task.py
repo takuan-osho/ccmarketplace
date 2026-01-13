@@ -407,23 +407,29 @@ All items must pass before completion:
 """
 
 
+def escape_braces(value: str) -> str:
+    """Escape braces so str.format does not treat them as placeholders."""
+    return value.replace("{", "{{").replace("}", "}}")
+
+
+def resolve_docs_dir(base_path: Path | None) -> Path:
+    """Resolve docs/ directory from an optional base path."""
+    if base_path:
+        return base_path / "docs"
+
+    docs_dir = find_docs_directory()
+    if docs_dir:
+        return docs_dir
+
+    return Path.cwd() / "docs"
+
+
 def create_task(
-    topic: str,
-    requirements: str | None = None,
-    path: Path | None = None
+    topic: str, requirements: str | None = None, path: Path | None = None
 ) -> None:
     """Create a new task directory with design.md and plan.md."""
-    # Determine tasks directory
-    if path:
-        tasks_dir = path / "docs" / "tasks"
-        docs_dir = path / "docs"
-    else:
-        docs_dir = find_docs_directory()
-        if docs_dir:
-            tasks_dir = docs_dir / "tasks"
-        else:
-            tasks_dir = Path.cwd() / "docs" / "tasks"
-            docs_dir = Path.cwd() / "docs"
+    docs_dir = resolve_docs_dir(path)
+    tasks_dir = docs_dir / "tasks"
 
     tasks_dir.mkdir(parents=True, exist_ok=True)
 
@@ -457,33 +463,29 @@ def create_task(
     title = topic.replace("-", " ").title()
 
     # Create design.md
+    safe_title = escape_braces(title)
+    safe_requirements = escape_braces(req_links)
     design_content = DESIGN_TEMPLATE.format(
-        id=f"T-{task_id}",
-        title=title,
-        date=date,
-        requirements=req_links
+        id=f"T-{task_id}", title=safe_title, date=date, requirements=safe_requirements
     )
-    (task_dir / "design.md").write_text(design_content)
+    (task_dir / "design.md").write_text(design_content, encoding="utf-8")
 
     # Create plan.md
     plan_content = PLAN_TEMPLATE.format(
-        id=f"T-{task_id}",
-        title=title,
-        date=date,
-        requirements=req_links
+        id=f"T-{task_id}", title=safe_title, date=date, requirements=safe_requirements
     )
-    (task_dir / "plan.md").write_text(plan_content)
+    (task_dir / "plan.md").write_text(plan_content, encoding="utf-8")
 
     print(f"Created Task: {task_dir}")
     print(f"ID: T-{task_id}")
-    print(f"\nFiles created:")
+    print("\nFiles created:")
     print(f"  - {task_dir}/design.md")
     print(f"  - {task_dir}/plan.md")
-    print(f"\nNext steps:")
-    print(f"1. Edit design.md to document how you'll implement the requirements")
-    print(f"2. Edit plan.md to break down the implementation into phases")
-    print(f"3. Update the Links sections with requirement IDs")
-    print(f"4. Update status as you progress through phases")
+    print("\nNext steps:")
+    print("1. Edit design.md to document how you'll implement the requirements")
+    print("2. Edit plan.md to break down the implementation into phases")
+    print("3. Update the Links sections with requirement IDs")
+    print("4. Update status as you progress through phases")
 
 
 def main():
@@ -491,15 +493,19 @@ def main():
     parser = argparse.ArgumentParser(
         description="Create a new Task directory with design and plan documents"
     )
-    parser.add_argument("topic", help="Topic/name of the task (e.g., 'implement-user-auth')")
     parser.add_argument(
-        "--requirements", "-r",
-        help="Comma-separated requirement IDs (e.g., 'FR-a1b2c,NFR-d3e4f')"
+        "topic", help="Topic/name of the task (e.g., 'implement-user-auth')"
     )
     parser.add_argument(
-        "--path", "-p",
+        "--requirements",
+        "-r",
+        help="Comma-separated requirement IDs (e.g., 'FR-a1b2c,NFR-d3e4f')",
+    )
+    parser.add_argument(
+        "--path",
+        "-p",
         type=Path,
-        help="Base path for the project (default: current directory)"
+        help="Base path for the project (default: current directory)",
     )
 
     args = parser.parse_args()
