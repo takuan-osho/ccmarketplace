@@ -1,0 +1,9 @@
+{
+  "name": "gcm",
+  "description": "Generate Git Commit Message from staged changes following Conventional Commits format",
+  "version": "1.0.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "report",
+  "description": "Create structured investigation and analysis reports in GitHub Flavored Markdown",
+  "version": "1.0.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}

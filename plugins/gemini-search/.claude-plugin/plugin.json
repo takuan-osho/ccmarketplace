@@ -1,0 +1,9 @@
+{
+  "name": "gemini-search",
+  "description": "Web search using Google Gemini CLI tool",
+  "version": "1.0.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}

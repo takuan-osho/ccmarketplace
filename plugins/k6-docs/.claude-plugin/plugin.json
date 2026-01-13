@@ -1,0 +1,9 @@
+{
+  "name": "k6-docs",
+  "description": "Access Grafana k6 documentation for writing and debugging load testing scripts",
+  "version": "1.0.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}

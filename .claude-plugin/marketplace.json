@@ -1,0 +1,65 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "takuan-osho-ccmarketplace",
+  "description": "Personal Claude Code plugin marketplace with productivity skills for git workflows, reporting, and development tools.",
+  "owner": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "create-pr",
+      "description": "Create Pull Request with automated change analysis and Conventional Commits format",
+      "version": "1.0.0",
+      "author": {
+        "name": "SHIMIZU Taku"
+      },
+      "source": "./plugins/create-pr"
+    },
+    {
+      "name": "gcm",
+      "description": "Generate Git Commit Message from staged changes following Conventional Commits format",
+      "version": "1.0.0",
+      "author": {
+        "name": "SHIMIZU Taku"
+      },
+      "source": "./plugins/gcm"
+    },
+    {
+      "name": "report",
+      "description": "Create structured investigation and analysis reports in GitHub Flavored Markdown",
+      "version": "1.0.0",
+      "author": {
+        "name": "SHIMIZU Taku"
+      },
+      "source": "./plugins/report"
+    },
+    {
+      "name": "gemini-search",
+      "description": "Web search using Google Gemini CLI tool",
+      "version": "1.0.0",
+      "author": {
+        "name": "SHIMIZU Taku"
+      },
+      "source": "./plugins/gemini-search"
+    },
+    {
+      "name": "k6-docs",
+      "description": "Access Grafana k6 documentation for writing and debugging load testing scripts",
+      "version": "1.0.0",
+      "author": {
+        "name": "SHIMIZU Taku"
+      },
+      "source": "./plugins/k6-docs"
+    },
+    {
+      "name": "tdl",
+      "description": "Implement Traceable Development Lifecycle practices with end-to-end traceability tools",
+      "version": "1.0.0",
+      "author": {
+        "name": "SHIMIZU Taku"
+      },
+      "source": "./plugins/tdl"
+    }
+  ]
+}

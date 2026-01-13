@@ -1,0 +1,421 @@
+# ADR Template and Best Practices
+
+## Template Structure (Full ADR)
+
+```markdown
+# [Title]
+
+## Metadata
+
+- **ID**: ADR-xxxxx
+- **Type**: ADR
+- **Owner**: [Person or role]
+- **Reviewers**: [List of reviewers]
+- **Status**: Proposed | Accepted | Rejected | Deprecated | Superseded by ADR-xxxxx
+- **Date**: YYYY-MM-DD
+
+## Links
+
+- **Analysis**: [AN-xxxxx](../analysis/AN-xxxxx-topic.md) or N/A – [reason]
+- **Requirements**: [FR-xxxxx](../requirements/FR-xxxxx-topic.md) or N/A – [reason]
+- **Design**: [Link to design doc] or N/A – [reason]
+- **Plan**: [Link to plan doc] or N/A – [reason]
+- **Related ADRs**: [ADR-xxxxx](./ADR-xxxxx-topic.md) or N/A – [reason]
+- **Issue**: #123 or N/A – [reason]
+- **PR**: #456 or N/A – [reason]
+- **Supersedes**: [ADR-xxxxx] or N/A
+- **Superseded by**: N/A
+
+## Context
+
+[Describe the context and problem statement. What forces are at play?
+What are the constraints? What assumptions are being made?]
+
+## Success Metrics (Optional)
+
+[How will we measure the success of this decision?]
+
+## Decision
+
+### Decision Drivers
+
+- [Driver 1: e.g., Performance requirements]
+- [Driver 2: e.g., Team expertise]
+- [Driver 3: e.g., Cost constraints]
+
+### Options Considered
+
+#### Option 1: [Name]
+
+[Description]
+
+**Pros:**
+- [Pro 1]
+- [Pro 2]
+
+**Cons:**
+- [Con 1]
+- [Con 2]
+
+#### Option 2: [Name]
+
+[Description]
+
+**Pros:**
+- [Pro 1]
+
+**Cons:**
+- [Con 1]
+
+### Analysis
+
+[Comparative analysis of options against decision drivers]
+
+### Decision Outcome
+
+**Chosen option: [Selected Option]**
+
+[Justification for the choice]
+
+## Rationale
+
+[Detailed explanation of why this option was chosen, including trade-offs considered]
+
+## Consequences
+
+### Positive
+
+- [e.g., improvement of quality attribute satisfaction]
+- [e.g., enables future features]
+
+### Negative
+
+- [e.g., compromising quality attribute]
+- [e.g., technical debt introduced]
+
+### Neutral
+
+- [e.g., requires team training]
+- [e.g., changes development workflow]
+
+## Implementation Notes (Optional)
+
+[How will this decision be implemented? Any specific steps or considerations?]
+
+## Platform Considerations
+
+[If applicable: differences for Unix, Windows, Cross-Platform]
+
+## Security & Privacy
+
+[If applicable: security implications and mitigations]
+
+## Open Questions
+
+- [ ] Question 1
+- [ ] Question 2
+
+## External References
+
+- [Link to external reference 1]
+- [Link to external reference 2]
+```
+
+## Template Structure (ADR Lite)
+
+For tactical decisions with smaller scope:
+
+```markdown
+# [Title]
+
+## Metadata
+
+- **ID**: ADR-xxxxx
+- **Type**: ADR (Lite)
+- **Owner**: [Person or role]
+- **Reviewers**: [List of reviewers]
+- **Status**: Proposed
+- **Date**: YYYY-MM-DD
+
+## Links
+
+- **Analysis**: N/A – [reason]
+- **Requirements**: [FR-xxxxx] or N/A – [reason]
+- **Related ADRs**: N/A – [reason]
+- **Issue**: #123 or N/A – [reason]
+- **PR**: N/A – [reason]
+
+## Context
+
+[Brief description of the context and problem]
+
+## Decision
+
+**Chosen approach: [Selected approach]**
+
+[What was decided and why]
+
+## Consequences
+
+### Positive
+
+- [Positive outcome 1]
+
+### Negative
+
+- [Negative outcome 1]
+
+## Open Questions (Optional)
+
+- [ ] Question 1
+```
+
+## Creating ADRs
+
+Use the provided script to generate ADRs with unique random IDs:
+
+```bash
+# Full ADR
+python scripts/create_adr.py "Use PostgreSQL for data storage"
+
+# ADR Lite
+python scripts/create_adr.py "Minor API change" --lite
+```
+
+## Best Practices
+
+### 1. When to Write an ADR
+
+Write an ADR when making decisions about:
+
+- **Architecture**: Significant architectural choices (monolith vs microservices)
+- **Technology**: Technology stack selections (database, framework, library)
+- **Patterns**: Design patterns or coding standards
+- **Infrastructure**: Deployment strategies, hosting choices
+- **Security**: Security approaches and mechanisms
+- **Performance**: Performance optimization strategies
+
+**Rule of thumb**: If you'll need to remember "why we chose this" in 6 months, write an ADR.
+
+Use **ADR Lite** for tactical decisions that don't warrant a full analysis.
+
+### 2. Status Lifecycle
+
+- **Proposed**: Under discussion, not yet decided
+- **Accepted**: Decision made and approved
+- **Rejected**: Considered but not chosen
+- **Deprecated**: No longer recommended but still in use
+- **Superseded by ADR-xxxxx**: Replaced by a newer ADR (link to it)
+
+### 3. Links Section Rules
+
+- **Always include all link categories** - use `N/A – <reason>` if not applicable
+- **Use relative paths** for internal links
+- **External references** go in a separate "External References" section
+- **Update links** when relationships change
+
+### 4. Writing Style
+
+- **Context**: Describe the problem, not the solution
+- **Options**: Present 2-4 options objectively
+- **Decision**: Be clear about what was chosen and why
+- **Consequences**: Be honest about trade-offs
+
+### 5. Naming Conventions
+
+- **Filename**: `ADR-<5-char-id>-kebab-case-title.md` (e.g., `ADR-a3bf2-use-postgresql.md`)
+- **ID**: 5-character Base36 random ID (generated by script)
+- **Title**: Clear, specific, action-oriented
+  - ✅ "Use PostgreSQL for user data storage"
+  - ✅ "Implement JWT-based authentication"
+  - ❌ "Database choice"
+  - ❌ "Authentication"
+
+### 6. Common Pitfalls
+
+❌ **Using sequential IDs**: Use `create_adr.py` to generate random IDs
+❌ **Missing Links section**: Every ADR must have a Links section
+❌ **Too detailed**: ADRs are not implementation specs
+❌ **Too vague**: Readers should understand the decision clearly
+❌ **Missing context**: Always explain the "why"
+❌ **No alternatives**: Show you considered other options
+❌ **Outdated**: Update status when decisions change
+
+## Example: Good ADR
+
+```markdown
+# Use Redis for Session Storage
+
+## Metadata
+
+- **ID**: ADR-a3bf2
+- **Type**: ADR
+- **Owner**: Backend Team
+- **Reviewers**: DevOps Team, Security Team
+- **Status**: Accepted
+- **Date**: 2024-01-15
+
+## Links
+
+- **Analysis**: [AN-b4cd8](../analysis/AN-b4cd8-session-storage-analysis.md)
+- **Requirements**: [NFR-c5de9](../requirements/NFR-c5de9-session-latency.md)
+- **Design**: N/A – Design included in task
+- **Plan**: N/A – Implementation tracked in task
+- **Related ADRs**: [ADR-d6ef0](./ADR-d6ef0-multi-instance-deployment.md)
+- **Issue**: #234
+- **PR**: N/A – Not yet implemented
+- **Supersedes**: N/A
+- **Superseded by**: N/A
+
+## Context
+
+Our application needs to store user sessions with the following requirements:
+- Support 10,000+ concurrent users
+- Session data must survive application restarts
+- Sub-100ms read/write latency
+- Multi-instance deployment support
+
+Current in-memory sessions don't persist across restarts and can't be shared
+between application instances.
+
+## Decision
+
+### Decision Drivers
+
+- Performance: Sub-100ms latency requirement
+- Scalability: Support horizontal scaling
+- Reliability: Session persistence across restarts
+- Team expertise: Team familiar with Redis
+- Cost: Budget constraints favor open-source solutions
+
+### Options Considered
+
+#### Option 1: Redis
+
+In-memory data store with persistence options.
+
+**Pros:**
+- Excellent performance (sub-ms latency)
+- Built-in persistence mechanisms
+- Team has production experience
+- Rich data structures
+
+**Cons:**
+- Additional infrastructure to maintain
+- Memory consumption
+- Potential single point of failure
+
+#### Option 2: PostgreSQL
+
+Relational database we already use.
+
+**Pros:**
+- Already in our stack
+- ACID guarantees
+- Familiar to team
+
+**Cons:**
+- Slower than in-memory stores (~10-50ms latency)
+- More complex for key-value operations
+
+### Decision Outcome
+
+**Chosen option: Redis**
+
+Redis best meets our performance requirements while leveraging team expertise.
+
+## Rationale
+
+Redis provides the sub-millisecond latency required for session operations while
+offering persistence and cluster support for reliability. Our team's existing
+experience reduces implementation risk.
+
+## Consequences
+
+### Positive
+
+- Session operations will be extremely fast (<5ms)
+- Horizontal scaling becomes straightforward
+- Reduces load on PostgreSQL database
+
+### Negative
+
+- Need to manage Redis infrastructure
+- Additional monitoring and backup required
+- Memory usage needs careful monitoring
+
+### Neutral
+
+- Team training on Redis clustering (follow-up ADR needed)
+
+## Implementation Notes
+
+1. Deploy Redis in primary region initially
+2. Use Redis Sentinel for high availability
+3. Configure persistence with AOF for durability
+4. Implement session encryption before storage
+
+## Open Questions
+
+- [ ] Redis Cluster vs Sentinel for HA?
+- [ ] Session data encryption approach?
+
+## External References
+
+- [Redis Persistence](https://redis.io/docs/management/persistence/)
+- [Session Management Best Practices](https://example.com/sessions)
+```
+
+## Integration with Development
+
+### In Code Comments
+
+```python
+class SessionStore:
+    """Redis-based session storage.
+
+    Implements: NFR-c5de9
+    Design: ADR-a3bf2
+    """
+```
+
+### In Pull Requests
+
+```markdown
+## Traceability
+
+- **Requirements**: NFR-c5de9
+- **ADR**: ADR-a3bf2
+- **Issue**: #234
+```
+
+### In Git Commits
+
+```bash
+git commit -m "feat: Implement Redis session store
+
+Implements NFR-c5de9 Session Latency
+Related ADR: ADR-a3bf2
+
+Closes: #234"
+```
+
+## ADR Workflow
+
+```
+1. Identify decision needed
+   ↓
+2. Create ADR: python scripts/create_adr.py "Title"
+   ↓
+3. Fill in Context and Options
+   ↓
+4. Update Links section
+   ↓
+5. Discuss with stakeholders
+   ↓
+6. Make decision, update Decision Outcome
+   ↓
+7. Update status to "Accepted"
+   ↓
+8. Implement and reference ADR in code/PRs
+```
