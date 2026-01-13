@@ -186,7 +186,7 @@ Both design.md and plan.md must link to:
     for file_path, content in readme_files.items():
         full_path = base_path / file_path
         if not full_path.exists():
-            full_path.write_text(content)
+            full_path.write_text(content, encoding="utf-8")
             print(f"Created: {file_path}")
         else:
             print(f"Skipped (exists): {file_path}")
@@ -321,7 +321,7 @@ assignees: ''
     for file_path, content in templates.items():
         full_path = base_path / file_path
         if not full_path.exists():
-            full_path.write_text(content)
+            full_path.write_text(content, encoding="utf-8")
             print(f"Created: {file_path}")
         else:
             print(f"Skipped (exists): {file_path}")
@@ -343,13 +343,15 @@ def main():
     create_directory_structure(base_path)
     create_github_templates(base_path)
 
-    print(f"\nTDL documentation structure initialized successfully!")
-    print(f"\nNext steps:")
-    print(f"1. Create your first analysis: python scripts/create_analysis.py 'Topic'")
-    print(f"2. Create requirements: python scripts/create_requirement.py 'Title' --type FR")
-    print(f"3. Create ADRs: python scripts/create_adr.py 'Decision Title'")
-    print(f"4. Create tasks: python scripts/create_task.py 'task-name'")
-    print(f"5. Check traceability: python scripts/trace_status.py")
+    print("\nTDL documentation structure initialized successfully!")
+    print("\nNext steps:")
+    print("1. Create your first analysis: python scripts/create_analysis.py 'Topic'")
+    print(
+        "2. Create requirements: python scripts/create_requirement.py 'Title' --type FR"
+    )
+    print("3. Create ADRs: python scripts/create_adr.py 'Decision Title'")
+    print("4. Create tasks: python scripts/create_task.py 'task-name'")
+    print("5. Check traceability: python scripts/trace_status.py")
 
 
 if __name__ == "__main__":

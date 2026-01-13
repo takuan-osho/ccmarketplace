@@ -28,7 +28,7 @@ class Document:
     title: str
     path: Path
     status: str = "Unknown"
-    links: dict = field(default_factory=dict)
+    links: dict[str, list[str]] = field(default_factory=dict)
     raw_content: str = ""
 
 
@@ -37,21 +37,22 @@ class TraceabilityReport:
     """Summary of traceability analysis."""
 
     total_documents: int = 0
-    analyses: list = field(default_factory=list)
-    requirements: list = field(default_factory=list)
-    adrs: list = field(default_factory=list)
-    tasks: list = field(default_factory=list)
-    orphan_requirements: list = field(default_factory=list)
-    orphan_tasks: list = field(default_factory=list)
-    missing_links: list = field(default_factory=list)
+    analyses: list[Document] = field(default_factory=list)
+    requirements: list[Document] = field(default_factory=list)
+    adrs: list[Document] = field(default_factory=list)
+    tasks: list[Document] = field(default_factory=list)
+    orphan_requirements: list[Document] = field(default_factory=list)
+    orphan_tasks: list[Document] = field(default_factory=list)
+    missing_links: list[str] = field(default_factory=list)
     coverage_percent: float = 0.0
 
 
 # Patterns for extracting document information
 ID_PATTERN = re.compile(r"(AN|FR|NFR|ADR|T)-([a-z0-9]{5})", re.IGNORECASE)
-METADATA_PATTERN = re.compile(r"\*\*(\w+)\*\*:\s*(.+)", re.MULTILINE)
+METADATA_SECTION_PATTERN = re.compile(r"## Metadata\s*\n(.*?)(?=\n## |\Z)", re.DOTALL)
+METADATA_PATTERN = re.compile(r"\*\*([^*]+)\*\*:\s*(.+)", re.MULTILINE)
 LINK_PATTERN = re.compile(r"\*\*([^*]+)\*\*:\s*(.+)", re.MULTILINE)
-STATUS_PATTERN = re.compile(r"\*\*Status\*\*:\s*(\w+)", re.IGNORECASE)
+STATUS_PATTERN = re.compile(r"\*\*Status\*\*:\s*([^\n]+)", re.IGNORECASE)
 
 
 def find_docs_directory(start_path: Path | None = None) -> Path | None:
@@ -96,9 +97,31 @@ def extract_id(filename: str) -> str | None:
     return None
 
 
-def parse_links_section(content: str) -> dict:
+def normalize_doc_type(doc_type: str) -> str:
+    """Normalize document type labels for reporting."""
+    normalized = doc_type.strip()
+    if normalized.upper().startswith("ADR"):
+        return "ADR"
+    return normalized
+
+
+def parse_metadata_section(content: str) -> dict[str, str]:
+    """Parse the Metadata section from document content."""
+    metadata_match = METADATA_SECTION_PATTERN.search(content)
+    if not metadata_match:
+        return {}
+
+    metadata = {}
+    for match in METADATA_PATTERN.finditer(metadata_match.group(1)):
+        key = match.group(1).strip()
+        value = match.group(2).strip()
+        metadata[key] = value
+    return metadata
+
+
+def parse_links_section(content: str) -> dict[str, list[str]]:
     """Parse the Links section from document content."""
-    links = {}
+    links: dict[str, list[str]] = {}
 
     # Find Links section
     links_match = re.search(r"## Links\s*\n(.*?)(?=\n## |\Z)", content, re.DOTALL)
@@ -134,8 +157,17 @@ def parse_document(filepath: Path) -> Document | None:
         return None
 
     filename = filepath.name
+    metadata = parse_metadata_section(content)
     doc_type = extract_document_type(filename)
     doc_id = extract_id(filename)
+
+    if not doc_id:
+        doc_id = extract_id(metadata.get("ID", ""))
+
+    if not doc_type:
+        metadata_type = metadata.get("Type", "")
+        if metadata_type:
+            doc_type = normalize_doc_type(metadata_type)
 
     if not doc_type or not doc_id:
         return None
@@ -145,8 +177,11 @@ def parse_document(filepath: Path) -> Document | None:
     title = title_match.group(1) if title_match else filename
 
     # Extract status
-    status_match = STATUS_PATTERN.search(content)
-    status = status_match.group(1) if status_match else "Unknown"
+    status = metadata.get("Status")
+    if not status:
+        status_match = STATUS_PATTERN.search(content)
+        status = status_match.group(1) if status_match else "Unknown"
+    status = status.strip()
 
     # Parse links
     links = parse_links_section(content)
@@ -164,73 +199,87 @@ def parse_document(filepath: Path) -> Document | None:
 
 def scan_documents(docs_dir: Path) -> list[Document]:
     """Scan all TDL documents in the docs directory."""
-    documents = []
+    documents: list[Document] = []
 
-    # Scan analysis documents
-    analysis_dir = docs_dir / "analysis"
-    if analysis_dir.exists():
-        for f in analysis_dir.glob("AN-*.md"):
-            doc = parse_document(f)
+    def add_parsed_documents(paths: list[Path]) -> None:
+        for path in paths:
+            doc = parse_document(path)
             if doc:
                 documents.append(doc)
 
-    # Scan requirements documents
+    analysis_dir = docs_dir / "analysis"
+    if analysis_dir.exists():
+        add_parsed_documents(list(analysis_dir.glob("AN-*.md")))
+
     req_dir = docs_dir / "requirements"
     if req_dir.exists():
         for pattern in ["FR-*.md", "NFR-*.md"]:
-            for f in req_dir.glob(pattern):
-                doc = parse_document(f)
-                if doc:
-                    documents.append(doc)
+            add_parsed_documents(list(req_dir.glob(pattern)))
 
-    # Scan ADR documents
     adr_dir = docs_dir / "adr"
     if adr_dir.exists():
-        for f in adr_dir.glob("ADR-*.md"):
-            doc = parse_document(f)
-            if doc:
-                documents.append(doc)
+        add_parsed_documents(list(adr_dir.glob("ADR-*.md")))
 
-    # Scan task directories
-    tasks_dir = docs_dir / "tasks"
-    if tasks_dir.exists():
-        for task_dir in tasks_dir.iterdir():
-            if task_dir.is_dir() and task_dir.name.upper().startswith("T-"):
-                # Parse design.md and plan.md as part of the task
-                task_id = extract_id(task_dir.name)
-                if task_id:
-                    design_path = task_dir / "design.md"
-                    plan_path = task_dir / "plan.md"
-
-                    # Create a synthetic task document
-                    links = {}
-                    status = "Unknown"
-
-                    if design_path.exists():
-                        design_doc = parse_document(design_path)
-                        if design_doc:
-                            links.update(design_doc.links)
-                            status = design_doc.status
-
-                    if plan_path.exists():
-                        plan_doc = parse_document(plan_path)
-                        if plan_doc:
-                            links.update(plan_doc.links)
-                            if plan_doc.status != "Unknown":
-                                status = plan_doc.status
-
-                    documents.append(
-                        Document(
-                            id=task_id,
-                            doc_type="Task",
-                            title=task_dir.name,
-                            path=task_dir,
-                            status=status,
-                            links=links,
-                        )
-                    )
-
+    documents.extend(scan_tasks(docs_dir / "tasks"))
     return documents
+
+
+def scan_tasks(tasks_dir: Path) -> list[Document]:
+    """Scan task directories and synthesize task documents."""
+    if not tasks_dir.exists():
+        return []
+
+    task_documents: list[Document] = []
+    for task_dir in tasks_dir.iterdir():
+        task_doc = build_task_document(task_dir)
+        if task_doc:
+            task_documents.append(task_doc)
+    return task_documents
+
+
+def merge_links(
+    target: dict[str, list[str]], source: dict[str, list[str]]
+) -> None:
+    """Merge link lists without dropping existing entries."""
+    for key, ids in source.items():
+        bucket = target.setdefault(key, [])
+        for link_id in ids:
+            if link_id not in bucket:
+                bucket.append(link_id)
+
+
+def build_task_document(task_dir: Path) -> Document | None:
+    """Build a synthetic task document from task directory contents."""
+    if not (task_dir.is_dir() and task_dir.name.upper().startswith("T-")):
+        return None
+
+    task_id = extract_id(task_dir.name)
+    if not task_id:
+        return None
+
+    design_doc = parse_document(task_dir / "design.md")
+    plan_doc = parse_document(task_dir / "plan.md")
+
+    links: dict[str, list[str]] = {}
+    status = "Unknown"
+
+    if design_doc:
+        merge_links(links, design_doc.links)
+        status = design_doc.status
+
+    if plan_doc:
+        merge_links(links, plan_doc.links)
+        if plan_doc.status != "Unknown":
+            status = plan_doc.status
+
+    return Document(
+        id=task_id,
+        doc_type="Task",
+        title=task_dir.name,
+        path=task_dir,
+        status=status,
+        links=links,
+    )
 
 
 def analyze_traceability(documents: list[Document]) -> TraceabilityReport:
@@ -238,10 +287,7 @@ def analyze_traceability(documents: list[Document]) -> TraceabilityReport:
     report = TraceabilityReport()
     report.total_documents = len(documents)
 
-    # Build ID lookup
-    doc_by_id = {doc.id: doc for doc in documents}
-    requirement_ids = set()
-    task_ids = set()
+    requirement_ids: set[str] = set()
 
     # Categorize documents
     for doc in documents:
@@ -254,10 +300,9 @@ def analyze_traceability(documents: list[Document]) -> TraceabilityReport:
             report.adrs.append(doc)
         elif doc.doc_type == "Task":
             report.tasks.append(doc)
-            task_ids.add(doc.id)
 
     # Find requirements implemented by tasks
-    implemented_requirements = set()
+    implemented_requirements: set[str] = set()
     for task in report.tasks:
         req_links = task.links.get("Requirements", [])
         implemented_requirements.update(req_links)
@@ -406,9 +451,10 @@ def main():
     else:
         docs_dir = find_docs_directory()
 
-    if not docs_dir or not docs_dir.exists():
+    if docs_dir is None or not docs_dir.exists():
         print("Error: Could not find docs/ directory", file=sys.stderr)
         sys.exit(1)
+    assert docs_dir is not None
 
     # Scan and analyze
     documents = scan_documents(docs_dir)

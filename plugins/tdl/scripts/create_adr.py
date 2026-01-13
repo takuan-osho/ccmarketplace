@@ -225,18 +225,27 @@ def create_filename(title: str, adr_id: str) -> str:
     return f"ADR-{adr_id}-{title_slug}.md"
 
 
+def escape_braces(value: str) -> str:
+    """Escape braces so str.format does not treat them as placeholders."""
+    return value.replace("{", "{{").replace("}", "}}")
+
+
+def resolve_docs_dir(base_path: Path | None) -> Path:
+    """Resolve docs/ directory from an optional base path."""
+    if base_path:
+        return base_path / "docs"
+
+    docs_dir = find_docs_directory()
+    if docs_dir:
+        return docs_dir
+
+    return Path.cwd() / "docs"
+
+
 def create_adr(title: str, lite: bool = False, path: Path | None = None) -> None:
     """Create a new ADR file with random ID."""
-    if path:
-        adr_dir = path / "docs" / "adr"
-        docs_dir = path / "docs"
-    else:
-        docs_dir = find_docs_directory()
-        if docs_dir:
-            adr_dir = docs_dir / "adr"
-        else:
-            adr_dir = Path.cwd() / "docs" / "adr"
-            docs_dir = Path.cwd() / "docs"
+    docs_dir = resolve_docs_dir(path)
+    adr_dir = docs_dir / "adr"
 
     adr_dir.mkdir(parents=True, exist_ok=True)
 
@@ -254,11 +263,12 @@ def create_adr(title: str, lite: bool = False, path: Path | None = None) -> None
         sys.exit(1)
 
     template = ADR_TEMPLATE_LITE if lite else ADR_TEMPLATE_FULL
+    safe_title = escape_braces(title)
     content = template.format(
-        id=f"ADR-{adr_id}", title=title, date=datetime.now().strftime("%Y-%m-%d")
+        id=f"ADR-{adr_id}", title=safe_title, date=datetime.now().strftime("%Y-%m-%d")
     )
 
-    filepath.write_text(content)
+    filepath.write_text(content, encoding="utf-8")
 
     template_type = "Lite" if lite else "Full"
     print(f"Created ADR ({template_type}): {filepath}")
