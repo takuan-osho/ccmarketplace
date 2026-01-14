@@ -27,6 +27,43 @@ Use this skill when:
 - **Troubleshooting production issues** and need to trace back to requirements/design
 - **Conducting requirement analysis** and tracking implementation coverage
 
+## Interactive Mode (Claude Code only)
+
+When running in Claude Code and the user's intent is unclear, use AskUserQuestion tool to clarify:
+
+**Document Type** (if not specified in the user's request):
+- Question: "What type of TDL document do you want to create?"
+- Header: "Doc Type"
+- Options:
+  - "Analysis (AN-)" - Problem exploration and discovery
+  - "Requirement (FR/NFR-)" - Formal specification with acceptance criteria
+  - "ADR (ADR-)" - Architecture/design decision record
+  - "Task (T-)" - Implementation plan with design.md and plan.md
+
+**Requirement Type** (when creating a requirement):
+- Question: "What type of requirement is this?"
+- Header: "Req Type"
+- Options:
+  - "FR - Functional Requirement (Recommended)" - Feature or behavior specification
+  - "NFR - Non-Functional Requirement" - Performance, security, scalability, etc.
+
+**NFR Category** (when creating a non-functional requirement):
+- Question: "What category does this NFR belong to?"
+- Header: "Category"
+- Options:
+  - "Performance" - Response time, throughput
+  - "Security" - Authentication, authorization, data protection
+  - "Scalability" - Load handling, growth capacity
+  - "Reliability" - Availability, fault tolerance
+- If user needs a different category, they can specify via the "Other" option
+
+**ADR Template** (when creating an ADR):
+- Question: "Which ADR template should be used?"
+- Header: "Template"
+- Options:
+  - "Full ADR (Recommended)" - Comprehensive template for significant decisions
+  - "Lite ADR" - Simplified template for tactical decisions
+
 ## TDL Workflow Phases
 
 ```

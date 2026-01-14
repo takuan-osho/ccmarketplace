@@ -1,7 +1,7 @@
 {
   "name": "tdl",
   "description": "Implement Traceable Development Lifecycle practices with end-to-end traceability tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "SHIMIZU Taku",
     "email": "shimizu.taku@gmail.com"
