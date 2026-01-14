@@ -35,7 +35,28 @@ echo -e "\n=== Analyzing detailed changes ==="
 git diff main...HEAD --unified=3
 ```
 
-### 2. Generate PR Title and Description
+### 2. Confirm Related Information (Claude Code only)
+
+When running in Claude Code, use AskUserQuestion tool to confirm the following before generating PR content:
+
+**Related Issue**:
+- Question: "Is there a related GitHub Issue for this PR?"
+- Header: "Issue"
+- Options:
+  - "Enter Issue number" - Specify the issue number to link (e.g., #123)
+  - "No related issue" - This PR is not linked to any issue
+- If user selects "Enter Issue number", they can provide the number via the "Other" option
+- Use the provided number in "Closes #XXX" format in the PR description
+
+**Base Branch** (only if current branch name doesn't clearly indicate the target):
+- Question: "Which branch should this PR target?"
+- Header: "Base"
+- Options:
+  - "main (Recommended)" - Standard base branch
+  - "develop" - For projects using gitflow
+- If user needs a different branch, they can specify via the "Other" option
+
+### 3. Generate PR Title and Description
 
 Analyze the changes and generate an appropriate PR title and description based on:
 
@@ -107,7 +128,7 @@ Generate a description that provides the minimum prerequisite knowledge for revi
 - Future improvement plans (if applicable)
 - If none, write "n/a"
 
-### 3. Create PR
+### 4. Create PR
 
 ```bash
 # Verify main branch is up to date

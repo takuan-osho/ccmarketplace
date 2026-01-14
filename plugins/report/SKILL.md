@@ -11,9 +11,31 @@ This skill creates a structured report summarizing investigation and analysis wo
 
 ## Workflow
 
-### 1. Determine File Location and Name
+### 1. Confirm Report Details (Claude Code only)
 
-First, determine the file name and save location following these conventions:
+When running in Claude Code, use AskUserQuestion tool to confirm the following before creating the report:
+
+**Report Type**:
+- Question: "What type of report are you creating?"
+- Header: "Type"
+- Options:
+  - "Investigation" - Error investigation, debugging session documentation
+  - "Analysis" - Performance analysis, code analysis, data analysis
+  - "Audit" - Security audit, compliance review
+  - "Review" - Code review summary, architecture review
+- The selected type will be used in the report metadata
+
+**Save Location**:
+- Question: "Where should the report be saved?"
+- Header: "Location"
+- Options:
+  - "docs/reports/ (Recommended)" - Standard location for reports
+  - "docs/" - General documentation directory
+  - "Project root" - Save in the root directory
+
+### 2. Determine File Location and Name
+
+Based on the confirmed details, determine the file name and save location following these conventions:
 
 **File name format:**
 ```
@@ -39,14 +61,14 @@ docs/reports/database-performance-analysis-2025-11-13-0915.md
 docs/reports/security-vulnerability-audit-2025-11-13-1620.md
 ```
 
-### 2. Verify and Create Directory
+### 3. Verify and Create Directory
 
 If the save destination directory does not exist, create it:
 ```bash
 mkdir -p docs/reports
 ```
 
-### 3. Create Report
+### 4. Create Report
 
 Create the report following this standard structure:
 
@@ -95,7 +117,7 @@ Create the report following this standard structure:
 - Write file paths as links: `[filename.ts](path/to/filename.ts)`
 - Use ## or ### to create section hierarchy
 
-### 4. Save File and Confirm
+### 5. Save File and Confirm
 
 1. Save the report with the determined file name
 2. After saving, explicitly display the file path
