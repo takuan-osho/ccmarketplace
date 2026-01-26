@@ -29,6 +29,7 @@ Then browse and install plugins:
 
 | Plugin | Description |
 |--------|-------------|
+| [interview](plugins/interview/) | Conduct structured interviews to gather requirements and clarify specifications |
 | [report](plugins/report/) | Create structured reports in GitHub Flavored Markdown |
 | [tdl](plugins/tdl/) | Traceable Development Lifecycle with end-to-end traceability |
 
