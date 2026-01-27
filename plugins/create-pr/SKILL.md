@@ -15,22 +15,37 @@ This skill analyzes the differences between the current branch and the main bran
 
 First, analyze the differences between the current branch and the main branch in detail.
 
+**Performance Optimization (Parallel Fan-Out Pattern)**
+
+The following 4 git commands have no interdependencies and can be executed in parallel. By running them concurrently, latency can be reduced by approximately 75% compared to sequential execution.
+
+| Command | Purpose |
+|---------|---------|
+| `git diff main...HEAD --name-only` | List of changed files |
+| `git diff main...HEAD --stat` | Change statistics |
+| `git log main..HEAD --pretty=format:"- %s"` | Commit history |
+| `git diff main...HEAD --unified=3` | Detailed diff |
+
+> **Note for AI agents**: These commands should be invoked as parallel tool calls in a single request, not sequentially. This follows the [Google ADK Parallel Fan-Out pattern](https://google.github.io/adk-docs/agents/multi-agents/#parallel-agent) for optimal performance.
+
 ```bash
-# List of changed files
+# The following commands can be run in PARALLEL (no dependencies between them):
+
+# [Parallel 1] List of changed files
 echo "=== Changed files ==="
 CHANGED_FILES=$(git diff main...HEAD --name-only)
 echo "$CHANGED_FILES"
 
-# Change statistics
+# [Parallel 2] Change statistics
 echo -e "\n=== Change statistics ==="
 git diff main...HEAD --stat
 
-# Commit history
+# [Parallel 3] Commit history
 echo -e "\n=== Commit history ==="
 COMMIT_MESSAGES=$(git log main..HEAD --pretty=format:"- %s")
 echo "$COMMIT_MESSAGES"
 
-# Detailed diff (to understand the nature of changes)
+# [Parallel 4] Detailed diff (to understand the nature of changes)
 echo -e "\n=== Analyzing detailed changes ==="
 git diff main...HEAD --unified=3
 ```
