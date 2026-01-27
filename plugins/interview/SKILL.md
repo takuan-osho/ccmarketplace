@@ -21,19 +21,23 @@ This skill provides a structured interview framework to systematically gather in
 
 ### Phase 1: Preparation (Silent)
 
-Before asking questions, gather background context silently:
+Before asking questions, gather background context silently.
 
-**Codebase Exploration:**
+> **Parallel Fan-Out Pattern**: The following three preparation tasks have no dependencies on each other and SHOULD be executed in parallel. This reduces Phase 1 completion time by approximately 66%.
+>
+> Reference: [Google ADK Multi-Agent Patterns](https://google.github.io/adk-docs/agents/multi-agents/)
+
+**Codebase Exploration:** *(parallel task 1/3)*
 - Project structure - Identify key directories, config files, entry points
 - Recent changes - Check git history if applicable
 - Related code - Search for relevant patterns or implementations
 
-**Documentation Review:**
+**Documentation Review:** *(parallel task 2/3)*
 - Read any referenced files or URLs provided by user
 - Check for existing specifications, ADRs, or design documents
 - Review related issues or PRs if applicable
 
-**Web Research (if applicable):**
+**Web Research (if applicable):** *(parallel task 3/3)*
 - Best practices for the domain
 - Similar implementations or patterns
 - Security considerations
