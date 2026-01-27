@@ -58,7 +58,7 @@ codex --model gpt-5.2-codex "Review this code: $(cat src/auth.ts)"
 | Model | Description | Use Case |
 |-------|-------------|----------|
 | `gpt-5.2-codex` | Latest Codex model | Complex reasoning, architecture |
-| `gpt-5-codex` | Previous generation | General coding tasks |
+| `gpt-5.2` | General model | General coding tasks |
 
 ### Tips
 
