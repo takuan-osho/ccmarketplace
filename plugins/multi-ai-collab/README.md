@@ -13,9 +13,9 @@ Orchestrate multiple AI agents (Codex CLI, Gemini CLI, Claude) with specialized 
 
 | Agent | CLI Command | Model | Best For |
 |-------|-------------|-------|----------|
-| Codex CLI | `codex` | gpt-5.2-codex | Deep reasoning, architecture |
-| Gemini CLI | `gemini` | gemini-3-flash-preview | Web search, latest info |
-| Claude | Task subagent | claude-sonnet/opus | Fast implementation, orchestration |
+| Codex CLI | `codex` | latest default | Deep reasoning, architecture |
+| Gemini CLI | `gemini` | latest default | Web search, latest info |
+| Claude | Task subagent | latest default | Fast implementation, orchestration |
 
 ## Available Personas
 
