@@ -44,7 +44,7 @@ which claude && claude --version
         ▼                       ▼                       ▼
 ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
 │   Codex CLI   │       │  Gemini CLI   │       │ Claude (sub)  │
-│ gpt-5.2-codex │       │gemini-2.5-pro │       │    sonnet     │
+│ gpt-5.2-codex │       │gemini-3-flash-preview │       │    sonnet     │
 │               │       │               │       │               │
 │   Persona:    │       │   Persona:    │       │   Persona:    │
 │   Architect   │       │   Security    │       │  QA Engineer  │
@@ -88,17 +88,17 @@ Assign an AI agent to each selected persona:
 
 Architect:
   1. Codex CLI (gpt-5.2-codex) - Recommended: deep reasoning
-  2. Gemini CLI (gemini-2.5-pro)
+  2. Gemini CLI (gemini-3-flash-preview)
   3. Claude (sub-agent)
 
 Security Researcher:
   1. Codex CLI (gpt-5.2-codex)
-  2. Gemini CLI (gemini-2.5-pro) - Recommended: can search latest CVEs
+  2. Gemini CLI (gemini-3-flash-preview) - Recommended: can search latest CVEs
   3. Claude (sub-agent)
 
 Code Reviewer:
   1. Codex CLI (gpt-5.2-codex)
-  2. Gemini CLI (gemini-2.5-pro)
+  2. Gemini CLI (gemini-3-flash-preview)
   3. Claude (sub-agent) - Recommended: fast iteration
 ```
 
@@ -160,7 +160,7 @@ Analyze the following code for:
 
 [CODE_CONTENT]
 
-Provide vulnerabilities with CVSS scores and remediation steps." -m gemini-2.5-pro
+Provide vulnerabilities with CVSS scores and remediation steps." -m gemini-3-flash-preview
 
 # Claude sub-agent (QA persona)
 # Use Task tool with subagent_type: general-purpose
@@ -360,13 +360,13 @@ codex --model gpt-5.2-codex "Review this code: $(cat src/file.ts)"
 
 ```bash
 # Basic invocation with model
-gemini -p "prompt" -m gemini-2.5-pro
+gemini -p "prompt" -m gemini-3-flash-preview
 
 # With JSON output
-gemini -p "prompt" -m gemini-2.5-pro --output-format json
+gemini -p "prompt" -m gemini-3-flash-preview --output-format json
 
 # Non-interactive mode (required for scripting)
-gemini -p "prompt" -m gemini-2.5-pro
+gemini -p "prompt" -m gemini-3-flash-preview
 ```
 
 ### Claude Code (Sub-agent)
@@ -408,7 +408,7 @@ claude -p "prompt" --max-turns 5
 | Persona | AI Agent | Model | Focus |
 |---------|----------|-------|-------|
 | 🏗️ Architect | Codex CLI | gpt-5.2-codex | Design & Structure |
-| 🔒 Security | Gemini CLI | gemini-2.5-pro | Vulnerabilities |
+| 🔒 Security | Gemini CLI | gemini-3-flash-preview | Vulnerabilities |
 | 🧪 QA | Claude (sub) | sonnet | Test Design |
 
 **Workflow:** Parallel (Cross-Review)

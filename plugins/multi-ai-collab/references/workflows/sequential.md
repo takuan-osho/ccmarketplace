@@ -106,7 +106,7 @@ Building on the Architect's analysis, perform a security review:
 - Pay special attention to the interfaces highlighted
 
 [CODE_CONTENT]
-" -m gemini-2.5-pro)
+" -m gemini-3-flash-preview)
 ```
 
 ```bash

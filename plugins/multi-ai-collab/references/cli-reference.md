@@ -103,10 +103,10 @@ export GEMINI_API_KEY="your-api-key"
 gemini -p "Your prompt here"
 
 # With model specification
-gemini -p "Your prompt here" -m gemini-2.5-pro
+gemini -p "Your prompt here" -m gemini-3-flash-preview
 
 # JSON output format
-gemini -p "Your prompt here" -m gemini-2.5-pro --output-format json
+gemini -p "Your prompt here" -m gemini-3-flash-preview --output-format json
 
 # Including multiple directories
 gemini --include-directories ../lib,../docs -p "Analyze these directories"
@@ -120,16 +120,15 @@ $(cat src/auth.ts)
 
 Check for OWASP Top 10 issues.
 EOF
-)" -m gemini-2.5-pro
+)" -m gemini-3-flash-preview
 ```
 
 ### Model Options
 
 | Model | Description | Use Case |
 |-------|-------------|----------|
-| `gemini-2.5-pro` | Latest Pro model | Complex analysis |
-| `gemini-2.5-flash` | Fast model | Quick tasks |
-| `gemini-2.0-flash` | Previous generation | Fallback |
+| `gemini-3-flash-preview` | Latest Flash model | Quick tasks |
+| `gemini-3-pro-preview` | Latest Pro model | Complex analysis |
 
 ### Tips
 
@@ -220,7 +219,7 @@ For QA analysis, use the Task tool:
 CODEX_RESULT=$(codex --model gpt-5.2-codex "prompt")
 
 # Capture Gemini output
-GEMINI_RESULT=$(gemini -p "prompt" -m gemini-2.5-pro)
+GEMINI_RESULT=$(gemini -p "prompt" -m gemini-3-flash-preview)
 
 # Capture Claude output
 CLAUDE_RESULT=$(claude -p "prompt")
@@ -241,7 +240,7 @@ codex --model gpt-5.2-codex "Review this: $FILE_CONTENT"
 ```bash
 # Sequential execution
 STEP1=$(codex --model gpt-5.2-codex "First analysis")
-STEP2=$(gemini -p "Build on this: $STEP1" -m gemini-2.5-pro)
+STEP2=$(gemini -p "Build on this: $STEP1" -m gemini-3-flash-preview)
 FINAL=$(claude -p "Synthesize: $STEP1 and $STEP2")
 ```
 
@@ -250,7 +249,7 @@ FINAL=$(claude -p "Synthesize: $STEP1 and $STEP2")
 ```bash
 # Background execution
 codex --model gpt-5.2-codex "Analysis A" > /tmp/result_a.txt &
-gemini -p "Analysis B" -m gemini-2.5-pro > /tmp/result_b.txt &
+gemini -p "Analysis B" -m gemini-3-flash-preview > /tmp/result_b.txt &
 claude -p "Analysis C" > /tmp/result_c.txt &
 
 # Wait for all
@@ -315,7 +314,7 @@ done
 │  codex --model gpt-5.2-codex "prompt"                              │
 │                                                                     │
 │  GEMINI CLI                                                         │
-│  gemini -p "prompt" -m gemini-2.5-pro                              │
+│  gemini -p "prompt" -m gemini-3-flash-preview                              │
 │                                                                     │
 │  CLAUDE CLI                                                         │
 │  claude -p "prompt"                                                 │

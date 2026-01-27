@@ -148,7 +148,7 @@ Your task:
 4. Find edge cases that break the proposal
 
 Be rigorous but constructive. Aim to improve, not just criticize.
-" -m gemini-2.5-pro
+" -m gemini-3-flash-preview
 ```
 
 ### Step 3: Round 2 - Rebuttals
@@ -182,7 +182,7 @@ Respond:
 2. Press on unaddressed concerns
 3. Identify any new weaknesses in rebuttals
 4. Summarize remaining critical issues
-" -m gemini-2.5-pro
+" -m gemini-3-flash-preview
 ```
 
 ### Step 4: Final Arguments

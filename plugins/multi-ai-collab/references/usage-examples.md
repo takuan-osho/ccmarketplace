@@ -51,7 +51,7 @@ Q1: Select personas for this review
 
 Q2: Assign agents
     Architect → Codex CLI (gpt-5.2-codex)
-    Security → Gemini CLI (gemini-2.5-pro)
+    Security → Gemini CLI (gemini-3-flash-preview)
     QA → Claude (sub-agent)
 
 Q3: Workflow mode
@@ -149,7 +149,7 @@ List vulnerabilities with:
 - Attack scenario
 - Remediation
 EOF
-)" -m gemini-2.5-pro
+)" -m gemini-3-flash-preview
 ```
 
 **Agent C: Claude as QA Engineer**
@@ -289,7 +289,7 @@ You are the OPPONENT challenging this payment implementation.
 2. Find vulnerabilities the proponent missed
 3. Propose attack scenarios
 4. Suggest alternative, more secure approaches
-" -m gemini-2.5-pro
+" -m gemini-3-flash-preview
 ```
 
 Result:
@@ -459,7 +459,7 @@ You are performing final review before merge.
 
 ## Decision
 APPROVE or REQUEST_CHANGES with specific items
-" -m gemini-2.5-pro
+" -m gemini-3-flash-preview
 ```
 
 Result:

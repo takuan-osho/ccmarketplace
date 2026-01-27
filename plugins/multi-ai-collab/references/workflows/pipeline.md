@@ -188,7 +188,7 @@ You are a Senior Code Reviewer performing a final quality gate review.
 2. Required changes (if any)
 3. Suggestions (optional improvements)
 4. Security/Performance flags
-" -m gemini-2.5-pro
+" -m gemini-3-flash-preview
 ```
 
 ### Step 4: Feedback Loop (if needed)
