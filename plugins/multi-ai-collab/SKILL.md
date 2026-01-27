@@ -44,7 +44,7 @@ which claude && claude --version
         ▼                       ▼                       ▼
 ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
 │   Codex CLI   │       │  Gemini CLI   │       │ Claude (sub)  │
-│ gpt-5.2-codex │       │gemini-3-flash-preview │       │    sonnet     │
+│  latest       │       │  latest       │       │   latest      │
 │               │       │               │       │               │
 │   Persona:    │       │   Persona:    │       │   Persona:    │
 │   Architect   │       │   Security    │       │  QA Engineer  │
@@ -62,7 +62,7 @@ The orchestrator performs initial analysis:
 
 ### Phase 2: Team Assembly (Interactive)
 
-Use **AskUserTool** (Claude) or equivalent to configure the team:
+Use the **environment-appropriate user input tool** to configure the team:
 
 #### Q1: Select Personas (Multiple Choice)
 
@@ -87,18 +87,18 @@ Recommended based on task analysis: 1, 2, 4
 Assign an AI agent to each selected persona:
 
 Architect:
-  1. Codex CLI (gpt-5.2-codex) - Recommended: deep reasoning
-  2. Gemini CLI (gemini-3-flash-preview)
+  1. Codex CLI (latest default) - Recommended: deep reasoning
+  2. Gemini CLI (latest default)
   3. Claude (sub-agent)
 
 Security Researcher:
-  1. Codex CLI (gpt-5.2-codex)
-  2. Gemini CLI (gemini-3-flash-preview) - Recommended: can search latest CVEs
+  1. Codex CLI (latest default)
+  2. Gemini CLI (latest default) - Recommended: can search latest CVEs
   3. Claude (sub-agent)
 
 Code Reviewer:
-  1. Codex CLI (gpt-5.2-codex)
-  2. Gemini CLI (gemini-3-flash-preview)
+  1. Codex CLI (latest default)
+  2. Gemini CLI (latest default)
   3. Claude (sub-agent) - Recommended: fast iteration
 ```
 
@@ -138,8 +138,8 @@ The orchestrator executes the configured workflow.
 **Execution Commands:**
 
 ```bash
-# Codex CLI (Architect persona)
-codex --model gpt-5.2-codex "You are a Senior Software Architect.
+# Codex CLI (Architect persona) - omit --model to use latest default
+codex "You are a Senior Software Architect.
 Analyze the following code for:
 - Modularity and separation of concerns
 - Dependency management
@@ -150,7 +150,7 @@ Analyze the following code for:
 
 Provide findings with severity (Critical/High/Medium/Low) and recommendations."
 
-# Gemini CLI (Security persona)
+# Gemini CLI (Security persona) - omit -m to use latest default
 gemini -p "You are a Security Researcher.
 Analyze the following code for:
 - OWASP Top 10 vulnerabilities
@@ -160,10 +160,10 @@ Analyze the following code for:
 
 [CODE_CONTENT]
 
-Provide vulnerabilities with CVSS scores and remediation steps." -m gemini-3-flash-preview
+Provide vulnerabilities with CVSS scores and remediation steps."
 
 # Claude sub-agent (QA persona)
-# Use Task tool with subagent_type: general-purpose
+# Use the environment-appropriate subagent tool (Claude Code Task / Codex spawn_agent)
 "You are a QA Engineer.
 Based on the code, design:
 - Required test cases (unit, integration, e2e)
@@ -202,18 +202,18 @@ Agent A (Claim) ←──Challenge──→ Agent B (Counter)
         └─────── Debate ───────────────┘
                    │
                    ▼
-         User Decision (AskUserTool)
+         User Decision (User Input Tool)
 ```
 
 ### Phase 4: Synthesis
 
 The orchestrator consolidates all results:
 
-1. **Collect results** from all agents
-2. **Identify consensus** - Points all agents agree on
-3. **Identify divergence** - Points where agents disagree
-4. **Prioritize actions** - Create actionable items with priority
-5. **Handle conflicts** - Use AskUserTool for unresolved disagreements
+ 1. **Collect results** from all agents
+ 2. **Identify consensus** - Points all agents agree on
+ 3. **Identify divergence** - Points where agents disagree
+ 4. **Prioritize actions** - Create actionable items with priority
+ 5. **Handle conflicts** - Use the environment-appropriate user input tool for unresolved disagreements
 
 ---
 
@@ -346,38 +346,38 @@ The orchestrator consolidates all results:
 ### Codex CLI
 
 ```bash
-# Basic invocation with model
-codex --model gpt-5.2-codex "prompt"
+# Basic invocation (latest default)
+codex "prompt"
 
-# With config override
-codex --config model='"gpt-5.2-codex"' "prompt"
+# With explicit model (if you must pin it)
+codex --config model='"<latest-codex-model>"' "prompt"
 
-# Reading from file
-codex --model gpt-5.2-codex "Review this code: $(cat src/file.ts)"
+# Reading from file (latest default)
+codex "Review this code: $(cat src/file.ts)"
 ```
 
 ### Gemini CLI
 
 ```bash
-# Basic invocation with model
-gemini -p "prompt" -m gemini-3-flash-preview
+# Basic invocation (latest default)
+gemini -p "prompt"
 
-# With JSON output
-gemini -p "prompt" -m gemini-3-flash-preview --output-format json
+# With JSON output (latest default)
+gemini -p "prompt" --output-format json
 
 # Non-interactive mode (required for scripting)
-gemini -p "prompt" -m gemini-3-flash-preview
+gemini -p "prompt"
 ```
 
 ### Claude Code (Sub-agent)
 
-For Claude Code, use the Task tool with `subagent_type: general-purpose`:
+For Claude Code, use the Task tool with `subagent_type: general-purpose` (default/latest model):
 
 ```
 Task tool parameters:
   subagent_type: general-purpose
   prompt: "[Persona prompt with task]"
-  model: sonnet (default) or opus (for complex tasks)
+  model: omit to use latest default, or specify if you must pin
 ```
 
 For other AI agent CLIs invoking Claude:
@@ -407,9 +407,9 @@ claude -p "prompt" --max-turns 5
 
 | Persona | AI Agent | Model | Focus |
 |---------|----------|-------|-------|
-| 🏗️ Architect | Codex CLI | gpt-5.2-codex | Design & Structure |
-| 🔒 Security | Gemini CLI | gemini-3-flash-preview | Vulnerabilities |
-| 🧪 QA | Claude (sub) | sonnet | Test Design |
+| 🏗️ Architect | Codex CLI | latest default | Design & Structure |
+| 🔒 Security | Gemini CLI | latest default | Vulnerabilities |
+| 🧪 QA | Claude (sub) | latest default | Test Design |
 
 **Workflow:** Parallel (Cross-Review)
 **Target:** [files/directories]
@@ -512,13 +512,13 @@ Orchestrator:
 2. Detects available agents (codex, gemini, claude)
 3. Recommends personas: Architect, Security, Code Reviewer
 
-AskUserTool: "Select personas for this review"
+User Input Tool: "Select personas for this review"
 User: 1, 2, 4 (Architect, Security, Code Reviewer)
 
-AskUserTool: "Assign agents to personas"
+User Input Tool: "Assign agents to personas"
 User: Codex→Architect, Gemini→Security, Claude→Reviewer
 
-AskUserTool: "Select workflow mode"
+User Input Tool: "Select workflow mode"
 User: 1 (Parallel)
 
 Execution:
@@ -595,21 +595,32 @@ which codex gemini claude
 ### Conflicting results
 
 - Use Adversarial mode for deeper analysis
-- Escalate to user via AskUserTool
+- Escalate to user via the environment-appropriate user input tool
 - Document disagreement in report
 
 ---
 
 ## Environment-Specific Notes
 
+### Codex CLI Environment
+
+- Use `request_user_input` for persona selection and workflow mode
+- Use `spawn_agent` for subagents (latest default model)
+- Use `exec_command` to invoke external CLIs (gemini, claude)
+
 ### Claude Code Environment
 
-- Use **AskUserTool** for all user interactions
-- Use **Task tool** with `subagent_type: general-purpose` for Claude sub-agents
+- Use **AskUserTool** for user interactions
+- Use **Task tool** with `subagent_type: general-purpose` for Claude sub-agents (latest default model)
 - Use **Bash tool** to invoke external CLIs (codex, gemini)
+
+### Gemini CLI Environment
+
+- Use numbered prompt options for user selection (no tool calls)
+- Use `gemini -p` directly for execution (latest default model)
+- For subagents, invoke other CLIs directly (codex/claude) with latest defaults
 
 ### Other AI Agent Environments
 
-- Use numbered options for user selection
-- Invoke CLIs directly via shell
-- Adapt prompt format as needed
+- Use the platform's equivalent of: user input, subagent, and shell execution tools
+- Default to each CLI's latest model unless explicitly pinned
