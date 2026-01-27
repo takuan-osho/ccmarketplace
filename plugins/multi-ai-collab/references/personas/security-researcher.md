@@ -87,7 +87,7 @@ For each vulnerability:
 
 ## Recommended AI Agent
 
-**Primary**: Gemini CLI (gemini-2.5-pro)
+**Primary**: Gemini CLI (gemini-3-flash-preview)
 - Can search for latest CVEs and security advisories
 - Access to current vulnerability databases
 - Can check for known vulnerable dependencies

@@ -79,7 +79,7 @@ codex --model gpt-5.2-codex "
 gemini -p "
 [SECURITY PERSONA PROMPT]
 [CODE_CONTENT]
-" -m gemini-2.5-pro
+" -m gemini-3-flash-preview
 
 # Agent C: Claude as QA Engineer
 # Use Task tool with subagent_type: general-purpose

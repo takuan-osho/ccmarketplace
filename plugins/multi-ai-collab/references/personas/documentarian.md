@@ -84,7 +84,7 @@ For each gap:
 
 ## Recommended AI Agent
 
-**Primary**: Gemini CLI (gemini-2.5-pro)
+**Primary**: Gemini CLI (gemini-3-flash-preview)
 - Can search for documentation best practices
 - Good at comparing with well-documented projects
 - Can find official style guides
