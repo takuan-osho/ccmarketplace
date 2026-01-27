@@ -53,12 +53,38 @@ which claude && claude --version
 
 ### Phase 1: Task Analysis (Silent)
 
-The orchestrator performs initial analysis:
+The orchestrator performs initial analysis using a **Parallel Fan-Out** pattern for efficiency:
 
-1. **Identify target files/code** - Use Glob, Grep, Read tools to understand scope
-2. **Detect available AI agents** - Check which CLIs are installed
-3. **Analyze task nature** - Determine if it's implementation, review, refactoring, investigation
-4. **Recommend personas** - Suggest appropriate expert roles based on task
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     Phase 1: Parallel Fan-Out                       │
+│                                                                     │
+│   ┌─────────────────────┐     ┌─────────────────────┐              │
+│   │  Identify target    │     │  Detect available   │              │
+│   │  files/code         │     │  AI agents          │   PARALLEL   │
+│   └─────────┬───────────┘     └──────────┬──────────┘              │
+│             │                            │                          │
+│             └────────────┬───────────────┘                          │
+│                          ▼                                          │
+│             ┌─────────────────────┐                                 │
+│             │  Analyze task       │                                 │
+│             │  nature             │                     SEQUENTIAL  │
+│             └──────────┬──────────┘                                 │
+│                        ▼                                            │
+│             ┌─────────────────────┐                                 │
+│             │  Recommend          │                                 │
+│             │  personas           │                                 │
+│             └─────────────────────┘                                 │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Step 1 (Parallel):** Execute these tasks concurrently as they have no dependencies:
+- **Identify target files/code** - Use Glob, Grep, Read tools to understand scope
+- **Detect available AI agents** - Check which CLIs are installed (`which codex gemini claude`)
+
+**Step 2 (Sequential):** After parallel tasks complete, execute in order:
+- **Analyze task nature** - Determine if it's implementation, review, refactoring, investigation (requires file context from Step 1)
+- **Recommend personas** - Suggest appropriate expert roles based on task nature and available agents
 
 ### Phase 2: Team Assembly (Interactive)
 
@@ -194,16 +220,89 @@ Implementer → Tester → Reviewer
      └───────────┴──────────┴──→ Quality-assured output
 ```
 
-#### Adversarial Mode
+#### Adversarial Mode (Generator/Critic Pattern)
+
+This mode implements the **Generator and Critic** pattern from Google ADK for iterative refinement:
 
 ```
-Agent A (Claim) ←──Challenge──→ Agent B (Counter)
-        │                              │
-        └─────── Debate ───────────────┘
-                   │
-                   ▼
-         User Decision (User Input Tool)
+┌─────────────────────────────────────────────────────────────────────┐
+│              Generator/Critic Iteration Cycle                       │
+│                                                                     │
+│   ┌──────────────────────────────────────────────────────────────┐ │
+│   │                    Iteration Loop                             │ │
+│   │                                                               │ │
+│   │   ┌─────────────┐                                             │ │
+│   │   │  Generator  │──────────────┐                              │ │
+│   │   │  (Agent A)  │   Proposal   │                              │ │
+│   │   └─────────────┘              ▼                              │ │
+│   │         ▲              ┌─────────────┐                        │ │
+│   │         │              │   Critic    │                        │ │
+│   │         │              │  (Agent B)  │                        │ │
+│   │         │              └──────┬──────┘                        │ │
+│   │         │                     │                               │ │
+│   │         │   Feedback          ▼                               │ │
+│   │         │              ┌─────────────┐                        │ │
+│   │         └──────────────│  Evaluate   │                        │ │
+│   │                        │  Quality    │                        │ │
+│   │                        └──────┬──────┘                        │ │
+│   │                               │                               │ │
+│   │                 ┌─────────────┴─────────────┐                 │ │
+│   │                 ▼                           ▼                 │ │
+│   │         [Quality OK?]              [Max iterations?]          │ │
+│   │              │ No                        │ Yes                │ │
+│   │              └───── Continue ────────────┴── Exit ──────────▶ │ │
+│   └──────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│                               ▼                                     │
+│                    ┌─────────────────────┐                         │
+│                    │   Final Decision    │                         │
+│                    │  (User Input Tool)  │                         │
+│                    └─────────────────────┘                         │
+└─────────────────────────────────────────────────────────────────────┘
 ```
+
+**Configuration Parameters:**
+- `max_iterations`: Maximum number of generate-critique cycles (default: 3)
+- `quality_threshold`: Criteria for acceptable output (e.g., no Critical issues)
+- `escalate_on_deadlock`: Whether to involve user when agents cannot converge
+
+**Iteration Cycle:**
+
+1. **Generate Phase**: Generator agent produces a proposal/analysis
+2. **Critique Phase**: Critic agent evaluates and challenges the proposal
+3. **Evaluate Phase**: Check termination conditions:
+   - Quality threshold met (no Critical/High severity issues remain)
+   - Maximum iterations reached
+   - Agents have converged on consensus
+4. **Refine or Exit**: Either continue with refined proposal or exit to final decision
+
+**Example Adversarial Flow:**
+```
+Iteration 1:
+  Generator (Codex/Architect): "Propose microservices architecture"
+  Critic (Gemini/Security): "Challenges: Service-to-service auth gaps, data consistency risks"
+  Quality: Critical issues found → Continue
+
+Iteration 2:
+  Generator: "Refined proposal with OAuth2 service mesh, saga pattern for consistency"
+  Critic: "Medium concerns: Observability gaps, no circuit breaker"
+  Quality: No Critical issues → Continue (optional refinement)
+
+Iteration 3:
+  Generator: "Added distributed tracing, circuit breaker with fallbacks"
+  Critic: "Low concerns: Consider rate limiting for external APIs"
+  Quality: Acceptable → Exit
+
+Final: Present converged proposal to user for approval
+```
+
+**Termination Conditions:**
+| Condition | Action |
+|-----------|--------|
+| Quality threshold met | Exit with approved proposal |
+| max_iterations reached | Exit with best proposal + unresolved concerns |
+| Agents deadlocked | Escalate to user via User Input Tool |
+| Critical regression | Revert to previous iteration's proposal |
 
 ### Phase 4: Synthesis
 
