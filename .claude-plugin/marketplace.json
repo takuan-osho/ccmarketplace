@@ -73,7 +73,7 @@
     {
       "name": "multi-ai-collab",
       "description": "Orchestrate multiple AI agents (Codex, Gemini, Claude) with specialized personas for cross-review and collaborative development",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "author": {
         "name": "SHIMIZU Taku"
       },

@@ -139,7 +139,7 @@ The orchestrator executes the configured workflow.
 
 ```bash
 # Codex CLI (Architect persona) - omit --model to use latest default
-codex "You are a Senior Software Architect.
+codex exec "You are a Senior Software Architect.
 Analyze the following code for:
 - Modularity and separation of concerns
 - Dependency management
@@ -347,13 +347,13 @@ The orchestrator consolidates all results:
 
 ```bash
 # Basic invocation (latest default)
-codex "prompt"
+codex exec "prompt"
 
 # With explicit model (if you must pin it)
-codex --config model='"<latest-codex-model>"' "prompt"
+codex exec --config model='"<latest-codex-model>"' "prompt"
 
 # Reading from file (latest default)
-codex "Review this code: $(cat src/file.ts)"
+codex exec "Review this code: $(cat src/file.ts)"
 ```
 
 ### Gemini CLI
