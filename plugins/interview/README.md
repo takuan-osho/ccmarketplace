@@ -38,7 +38,7 @@ Examples:
 
 ## Features
 
-- **Environment-Aware Input** - AskUserQuestion tool in Claude Code, numbered options in other environments
+- **Environment-Aware Input** - AskUserTool tool in Claude Code, numbered options in other environments
 - **Multiple Interview Types** - Question frameworks tailored to the task
 - **Priority Classification** - Must/Should/Could requirement categorization
 - **Output Templates** - Consistent structured documentation

@@ -52,7 +52,7 @@ git diff main...HEAD --unified=3
 
 ### 2. Confirm Related Information (Claude Code only)
 
-When running in Claude Code, use AskUserQuestion tool to confirm the following before generating PR content:
+When running in Claude Code, use AskUserTool tool to confirm the following before generating PR content:
 
 **Related Issue**:
 - Question: "Is there a related GitHub Issue for this PR?"

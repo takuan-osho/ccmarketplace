@@ -13,7 +13,7 @@ This skill creates a structured report summarizing investigation and analysis wo
 
 ### 1. Confirm Report Details (Claude Code only)
 
-When running in Claude Code, use AskUserQuestion tool to confirm the following before creating the report:
+When running in Claude Code, use AskUserTool tool to confirm the following before creating the report:
 
 **Report Type**:
 - Question: "What type of report are you creating?"

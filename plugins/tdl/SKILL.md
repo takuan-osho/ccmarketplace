@@ -29,7 +29,7 @@ Use this skill when:
 
 ## Interactive Mode (Claude Code only)
 
-When running in Claude Code and the user's intent is unclear, use AskUserQuestion tool to clarify:
+When running in Claude Code and the user's intent is unclear, use AskUserTool tool to clarify:
 
 **Document Type** (if not specified in the user's request):
 - Question: "What type of TDL document do you want to create?"

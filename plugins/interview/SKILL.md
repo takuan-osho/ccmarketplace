@@ -53,7 +53,7 @@ Conduct the interview in stages, adapting questions based on interview type.
 Start by confirming the overall objective:
 
 **Environment-specific approach:**
-- **Claude Code**: Use AskUserQuestion tool for structured choices
+- **Claude Code**: Use AskUserTool tool for structured choices
 - **Other environments**: Present numbered options and ask user to reply with number or description
 
 **Core Questions:**
@@ -173,7 +173,7 @@ Quick reference:
 
 ### Claude Code Environment
 
-Use the AskUserQuestion tool for structured choices:
+Use the AskUserTool tool for structured choices:
 
 ```
 Question: "What type of interview is this?"
