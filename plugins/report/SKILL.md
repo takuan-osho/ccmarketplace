@@ -13,7 +13,9 @@ This skill creates a structured report summarizing investigation and analysis wo
 
 ### 1. Confirm Report Details (Claude Code only)
 
-When running in Claude Code, use AskUserQuestion tool to confirm the following before creating the report:
+When running in Claude Code, use AskUserQuestion tool to confirm the following before creating the report.
+
+**Auto Mode handling**: If the session is in Auto Mode (continuous, autonomous execution), skip the AskUserQuestion calls and apply these defaults: `Type = Investigation` (or the type the user already named in their request), `Location = docs/reports/`. Surface the chosen values in a one-line note in the final summary so the user can correct them. Do not block on user input in Auto Mode.
 
 **Report Type**:
 - Question: "What type of report are you creating?"
