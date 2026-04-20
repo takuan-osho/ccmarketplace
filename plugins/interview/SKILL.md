@@ -1,209 +1,214 @@
 ---
 name: interview
-description: Conduct structured interviews to gather requirements, clarify specifications, or understand context. This skill should be used when starting a new task that requires understanding user intent, requirements, technical specifications, or context. It supports various interview types including requirements definition, debugging investigation, architecture review, security review, documentation creation, and general information gathering.
+description: Conduct structured interviews to clarify scope, surface constraints, and reach a "do / don't do / done" agreement before starting non-trivial work. Use when receiving an ambiguous request, a vague task description, or before entering plan mode for any non-trivial implementation. Skip for one-line concrete fixes ("rename foo to bar") or single-fact questions. Supports requirements definition, debugging investigation, architecture review, security review, documentation creation, and general exploration.
 ---
 
 # Interview
 
-## Overview
+Act as a clarification interviewer that drills into a request until "do", "don't do", and "done" are unambiguous. Ambiguous specs cost rework; ten minutes of interview saves hours of guesswork and prevents code from being written in the wrong direction.
 
-This skill provides a structured interview framework to systematically gather information before starting work. It helps reduce ambiguity, ensure comprehensive understanding, and produce actionable outputs. The interview adapts to different contexts: requirements definition, debugging, architecture decisions, security review, and more.
+## Decide whether to interview
 
-## When to Use
+**Use this skill when:**
 
-- Starting a new feature implementation
-- Investigating bugs or issues
-- Reviewing architecture or security
-- Creating documentation or reports
-- Any task requiring clarification of scope, constraints, or expectations
+- A request lacks a clear scope ("I want to add auth", "investigate the 504 errors")
+- The task is large enough that approach matters (multi-file change, design decision, architectural choice)
+- You suspect hidden constraints, dependencies, or stakeholder expectations
+- Before entering plan mode for any non-trivial implementation
+
+**Skip this skill (act directly) when:**
+
+- A one-line concrete fix is requested ("rename foo to bar in baz.ts")
+- A single-fact question is answerable from the codebase
+- The user has already specified scope, constraints, and acceptance criteria
+
+If unsure, prefer interviewing — the cost of one extra clarification turn is far smaller than the cost of building the wrong thing.
 
 ## Workflow
 
-### Phase 1: Preparation (Silent)
+The interview is a **single iterative loop, not numbered phases**. Walk the decision tree branch by branch, **one question at a time**, until every branch converges on a decision (accepted, rejected, or explicitly deferred). The only "phase" header below is `Output`, which marks the moment you stop interviewing and produce the summary.
 
-Before asking questions, gather background context silently.
+### Question style
 
-> **Parallel Fan-Out Pattern**: The following three preparation tasks have no dependencies on each other and SHOULD be executed in parallel. This reduces Phase 1 completion time by approximately 66%.
->
-> Reference: [Google ADK Multi-Agent Patterns](https://google.github.io/adk-docs/agents/multi-agents/)
+| Rule | Why it matters |
+|------|----------------|
+| **One question per turn** | Multiple questions overwhelm and produce shallow, batched answers |
+| **Attach a recommended answer to every question** | User can confirm with "yes" and the conversation advances quickly |
+| **No upper bound on question count** | Stop when branches converge, not at a preset stage |
+| **Skip questions already answered by prior context** | Re-asking signals you weren't listening |
 
-**Codebase Exploration:** *(parallel task 1/3)*
-- Project structure - Identify key directories, config files, entry points
-- Recent changes - Check git history if applicable
-- Related code - Search for relevant patterns or implementations
+### Question template
 
-**Documentation Review:** *(parallel task 2/3)*
-- Read any referenced files or URLs provided by user
-- Check for existing specifications, ADRs, or design documents
-- Review related issues or PRs if applicable
-
-**Web Research (if applicable):** *(parallel task 3/3)*
-- Best practices for the domain
-- Similar implementations or patterns
-- Security considerations
-
-For detailed exploration commands per environment (Claude Code, Codex, API), see `references/exploration-patterns.md`.
-
-### Phase 2: Interview
-
-Conduct the interview in stages, adapting questions based on interview type.
-
-#### Stage 1: Goal Confirmation
-
-Start by confirming the overall objective:
-
-**Environment-specific approach:**
-- **Claude Code**: Use AskUserQuestion tool for structured choices
-- **Other environments**: Present numbered options and ask user to reply with number or description
-
-**Core Questions:**
-- What is the primary goal or outcome expected?
-- Who are the stakeholders or users affected?
-- What does success look like?
-
-**Interview Type Selection:**
-
-Ask the user to select the interview type to tailor subsequent questions:
-
-| Type | Use Case |
-|------|----------|
-| Requirements | New feature, specification, API design |
-| Investigation | Bug analysis, performance issue, incident |
-| Architecture | Design review, technology selection, refactoring |
-| Security | Security audit, vulnerability assessment |
-| Documentation | Report creation, knowledge transfer |
-| General | Open-ended exploration, brainstorming |
-
-#### Stage 2: Deep Dive
-
-Based on the selected interview type, ask targeted questions.
-
-For detailed question frameworks and output templates per interview type, read `references/interview-types.md`.
-
-#### Stage 3: Confirmation and Prioritization
-
-Before concluding:
-
-1. **Summarize Understanding** - Restate key points for confirmation
-2. **Identify Gaps** - Note any undecided or unclear items
-3. **Prioritize** - Classify requirements as Must/Should/Could
-4. **Confirm Scope** - Agree on what is in/out of scope
-
-### Deep Dive Strategies
-
-Use these techniques to reduce ambiguity:
-
-| Technique | When to Use |
-|-----------|-------------|
-| "Specifically?" | When details are vague |
-| "Why?" | When motivation is unclear |
-| "What else?" | When list seems incomplete |
-| "For example?" | When concept needs illustration |
-| "What if...?" | When edge cases need exploration |
-
-### Phase 3: Output
-
-Generate a structured summary document.
-
-#### Output Template
-
-```markdown
-# [Interview Type]: [Topic]
-
-## Summary
-[1-2 sentence overview]
-
-## Goal
-- **Objective**: [Primary goal]
-- **Stakeholders**: [Who is affected]
-- **Success Criteria**: [How to measure success]
-
-## Requirements / Findings
-### Must Have
-- [Item 1]
-- [Item 2]
-
-### Should Have
-- [Item 1]
-
-### Could Have
-- [Item 1]
-
-## Constraints
-- [Technical constraints]
-- [Business constraints]
-- [Timeline constraints]
-
-## Undecided / Open Questions
-- [ ] [Question 1]
-- [ ] [Question 2]
-
-## Next Steps
-1. [Action item 1]
-2. [Action item 2]
-
-## References
-- [Link or file reference 1]
-- [Link or file reference 2]
-
-## Affected Files / Components
-- `path/to/file1`
-- `path/to/file2`
+```
+Q: <single specific question>
+Recommended: <a concrete default with a one-line rationale>
 ```
 
-## Usage Examples
+The recommended answer should reflect the most common pattern, the safest choice, or the option suggested by codebase/web evidence you have already gathered. The user either accepts ("yes" / "go with that") or pushes back with their own answer.
 
-For detailed usage examples with sample outputs, see `references/usage-examples.md`.
+**Notation note**: The `Recommended: …` line is the canonical authoring format used in this skill's prose and examples. When the question is rendered through `AskUserQuestion`, the same recommendation is *displayed* as the first option labeled `(Recommended)` — they are the same content, just formatted for the channel.
 
-Quick reference:
-- `/interview Add user authentication` → Requirements interview
-- `/interview Investigate 504 errors` → Investigation interview
-- `/interview Review database schema` → Architecture interview
+### Branch order
+
+Resolve dependencies first (answers that constrain later questions), then breadth, then depth:
+
+1. **Goal / outcome** — what does success look like?
+2. **Stakeholders / users** — who is affected? *(Skip if the Goal answer already pins down a single user/role unambiguously, e.g. "reduce signup drop-off" implies end users.)*
+3. **Interview type** (see table below) — drives the subsequent question framing
+4. **Scope boundaries** — what is explicitly in / out
+5. **Constraints** — technical, business, timeline
+6. **Acceptance criteria** — observable "done" condition
+
+If the user expands or pivots the type mid-interview ("actually, also include the architecture decision"), do not restart. Treat the new branch as additive: append it to the open-branches list and continue the current branch first, then address the new one before convergence.
+
+### Interview types
+
+The user can name a type explicitly, or you can infer it from the request. The type drives which questions to prioritize.
+
+| Type | Use when | Drives questions about |
+|------|----------|----------------------|
+| Requirements | New feature, spec, API design | Behavior, edge cases, validation, error UX |
+| Investigation | Bug analysis, incident, performance issue | Symptoms, repro steps, hypotheses, blast radius |
+| Architecture | Design review, technology selection, refactor | Trade-offs, constraints, integration points |
+| Security | Audit, threat model, vulnerability scan | Assets, threats, controls, compliance scope |
+| Documentation | Report, runbook, onboarding doc | Audience, depth, format, distribution |
+| General | Open exploration, brainstorm | Whatever surfaces |
+
+### On-demand exploration
+
+Do **not** batch-explore the codebase or web upfront. Reach for these tools only when an answer would shape the very next question:
+
+- **Codebase** — `Glob` / `Grep` / `Read`, or `Agent` with the `Explore` subagent for surveys spanning many files
+- **Existing docs** — `Read` files the user already referenced
+- **Web** — `WebSearch` for library behavior, best practices, or security advisories
+
+Weave findings back into the next question:
+
+> "I read `src/auth/login.ts` — it uses NextAuth with the credentials provider. Should we extend that, or replace it for the new OAuth flow?"
+
+If exploration fails or the target cannot be located, skip it and ask the user directly rather than guessing.
+
+### Convergence
+
+A branch is converged when the user has either:
+
+- Accepted a concrete answer (the recommended option or their own)
+- Explicitly deferred to a separate decision (recorded as an "open question")
+
+Stop interviewing when **every** active branch is converged or deferred. Then move to the Output stage.
+
+## Output
+
+Generate a single Markdown summary. Default to English; match the user's language if they were typing in Japanese or another language.
+
+```markdown
+### Work Summary: <topic>
+
+**Goal**: <1-2 sentences capturing why this matters>
+
+**Type**: <one of the interview types>
+
+**In scope**:
+- <bullet>
+- <bullet>
+
+**Out of scope**:
+- <bullet>
+
+**Acceptance criteria / Done when**:
+- <observable, testable condition>
+- <another condition>
+
+**Open questions / Deferred**:
+- [ ] <unresolved item>
+
+**Constraints**:
+- <technical / business / timeline>
+
+**References**:
+- `<file path>` / <link> — <one-line note>
+```
+
+After the summary, surface next-step options:
+
+- "If you want to start building, I can enter plan mode."
+- "If we should drill into any item further, name which."
+
+## Edge cases
+
+| Situation | Handling |
+|-----------|----------|
+| User answers "I don't know" / "you decide" | Sequential, do not skip steps: **(1)** present **2 concrete options** with a one-line rationale each and re-ask; **(2)** if the user still defers or stays silent, propose a single recommended path and ask "OK to proceed with X?"; **(3)** if the user accepts, record the choice and tag it `[auto-decided]` in the Output summary so they can revisit it later. Never decide silently. |
+| Scope is too large for one interview | Propose splitting: "This is large; let's start with sub-area A. We can re-interview for B and C later." Then continue interviewing on the chosen sub-scope |
+| User contradicts a prior answer | Reflect both versions: "Earlier you said X; now Y. Which is current?" Update earlier decisions explicitly so the summary stays consistent |
+| No reasonable recommendation exists | Say so: "I don't have a strong recommendation — what matters most here: speed, cost, or correctness?" Frame the trade-off rather than guessing |
+| User wants to skip the interview mid-way | Honor it. Emit whatever Output summary you have so far, marking remaining branches as open questions |
+| User pushes back on the recommended answer | Treat the rejection as new information. Confirm their preferred answer and move on; do not argue |
+
+## Example
+
+```text
+User: "I want to add an export feature for teams"
+
+Q1: What is the export for — audit, data migration, or reporting?
+Recommended: Audit is the most common driver for "team export". OK?
+A1: Audit.
+
+[Reads src/teams/ — finds Team model with members, permissions, activity log]
+
+Q2: I see Team has members, permissions, and activity logs. Which fields
+should the export include?
+Recommended: For audit, members + permissions is the standard pair.
+Activity logs are usually exported separately.
+A2: Members and permissions.
+
+Q3: Format? CSV is the audit default; JSON is friendlier for tooling.
+Recommended: CSV.
+A3: CSV.
+
+Q4: Who can run the export? Admin-only is safer because it includes
+permission data.
+Recommended: Admin-only.
+A4: Yes.
+
+Q5: Anything explicitly out of scope — PDF, scheduling, encryption-at-rest?
+Recommended: Out of scope for v1; we can flag follow-ups separately.
+A5: All out of scope.
+
+Q6: "Done" when an admin can download a CSV containing members and
+permissions for a team. Correct?
+A6: Yes.
+
+[Output: Work Summary]
+```
+
+## Environment notes
+
+### Claude Code
+
+Use `AskUserQuestion` when the question has 2–4 concrete options. Label the recommended option `"(Recommended)"` and place it first. For open-ended answers, ask in plain text — `AskUserQuestion` is not the right shape for free-form input.
+
+### Codex / Gemini CLI / plain terminal
+
+Present the question and the recommended answer in plain text. Number multiple-choice options manually:
+
+```
+Q: Which export format?
+1. CSV (Recommended) — standard for audit exports
+2. JSON
+3. Other (please describe)
+```
+
+### Auto Mode
+
+If the orchestrator is in auto mode (continuous, autonomous execution), **do not block** waiting for user input. Apply the recommended answer to each question, mark each auto-applied choice as `[auto]` in the Output summary, and surface the chosen path so the user can correct it after the run completes. Continue interviewing only if the user joins the session interactively.
+
+**Simulation / dry-run override**: If the caller (user or another skill) explicitly asks you to *simulate* the interview, *render the dialogue*, or *show what you would ask*, the simulation request takes priority over Auto Mode — produce the Q&A turns rather than auto-deciding. Auto Mode only governs *real* user-facing runs where no human is present to answer.
 
 ## Guidelines
 
-1. **Adapt to Context** - Adjust question depth based on task complexity
-2. **Avoid Overwhelming** - Ask 2-3 questions at a time, not all at once
-3. **Be Specific** - Reference actual code, files, or examples when possible
-4. **Document Everything** - Capture decisions and their rationale
-5. **Identify Gaps Early** - Surface undecided items for follow-up
-6. **Output Language** - Follow user's language preference (check conversation history)
-
-## User Input Methods
-
-### Claude Code Environment
-
-Use the AskUserQuestion tool for structured choices:
-
-```
-Question: "What type of interview is this?"
-Header: "Type"
-Options:
-  - "Requirements (Recommended)" - New feature or specification
-  - "Investigation" - Bug or issue analysis
-  - "Architecture" - Design or technology review
-  - "Security" - Security assessment
-```
-
-This enables efficient selection with clickable options.
-
-### Other Environments (Codex, API, etc.)
-
-Present numbered options in plain text and wait for user response:
-
-```
-What type of interview is this?
-
-1. Requirements - New feature or specification (Recommended)
-2. Investigation - Bug or issue analysis
-3. Architecture - Design or technology review
-4. Security - Security assessment
-5. Documentation - Report creation, knowledge transfer
-6. General - Open-ended exploration
-
-Please reply with a number (1-6) or describe your needs:
-```
-
-Wait for the user's response before proceeding. Accept both:
-- Number selection (e.g., "1", "2")
-- Free-form description (e.g., "I need to investigate a performance issue")
+- **Match the user's language** in the summary; otherwise default to English
+- **Capture rationale**, not only decisions, so re-reading the summary still explains the *why*
+- **Surface gaps as open questions** rather than guessing
+- **Refer to actual code or links** when possible — concrete beats abstract
+- **One question per turn even when you have many** — list the others as a hidden TODO and address them after the current branch converges
