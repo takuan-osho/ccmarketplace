@@ -64,7 +64,7 @@
     {
       "name": "interview",
       "description": "Conduct structured interviews for requirements gathering, bug investigation, architecture review, and more",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "SHIMIZU Taku"
       },
