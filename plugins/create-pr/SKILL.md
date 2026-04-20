@@ -63,13 +63,17 @@ When running in Claude Code, use AskUserQuestion tool to confirm the following b
 - If user selects "Enter Issue number", they can provide the number via the "Other" option
 - Use the provided number in "Closes #XXX" format in the PR description
 
-**Base Branch** (only if current branch name doesn't clearly indicate the target):
+**Base Branch** (only if the current branch name doesn't clearly indicate its target):
+- "Clearly indicates target" examples (skip the question): `release/v1.2` → main, `hotfix/auth-bug` → main, `develop/feature-x` → develop
+- "Doesn't clearly indicate target" examples (ask the question): `feat/oauth-google`, `fix/parsing`, `chore/upgrade-deps`, ad-hoc topic branches
 - Question: "Which branch should this PR target?"
 - Header: "Base"
 - Options:
   - "main (Recommended)" - Standard base branch
   - "develop" - For projects using gitflow
 - If user needs a different branch, they can specify via the "Other" option
+
+**Non-Claude-Code Environments**: If `AskUserQuestion` is unavailable (Codex, Gemini CLI, plain terminal, etc.), do not block. Default to `main` as the base branch and skip Issue linking unless the user already provided an issue number; surface both choices in the final summary so the user can correct them.
 
 ### 3. Generate PR Title and Description
 

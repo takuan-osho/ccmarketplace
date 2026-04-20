@@ -1,6 +1,6 @@
 ---
 name: interview
-description: Conduct structured interviews to gather requirements, clarify specifications, or understand context. This skill should be used when starting a new task that requires understanding user intent, requirements, technical specifications, or context. It supports various interview types including requirements definition, debugging investigation, architecture review, and general information gathering.
+description: Conduct structured interviews to gather requirements, clarify specifications, or understand context. This skill should be used when starting a new task that requires understanding user intent, requirements, technical specifications, or context. It supports various interview types including requirements definition, debugging investigation, architecture review, security review, documentation creation, and general information gathering.
 ---
 
 # Interview

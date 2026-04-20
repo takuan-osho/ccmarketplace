@@ -668,6 +668,7 @@ Execution:
 5. **Always synthesize divergent opinions** - don't just merge results
 6. **Escalate to user** when agents fundamentally disagree
 7. **Limit personas to 3-4** per task to avoid information overload
+8. **If 4 personas are selected but only 3 distinct CLIs are available** (codex / gemini / claude), assign two personas to Claude sub-agents (spawn the Task tool twice with different persona prompts) — do not drop a persona
 
 ---
 
@@ -709,9 +710,10 @@ which codex gemini claude
 
 ### Claude Code Environment
 
-- Use **AskUserTool** for user interactions
+- Use **AskUserQuestion** tool for user interactions (not "AskUserTool")
 - Use **Task tool** with `subagent_type: general-purpose` for Claude sub-agents (latest default model)
 - Use **Bash tool** to invoke external CLIs (codex, gemini)
+- When invoking external CLIs that need file content, expand with `$(cat path/to/file)` or read the file via the Read tool first and inline the result; the `[CODE_CONTENT]` placeholder in Phase 3 examples must be replaced this way
 
 ### Gemini CLI Environment
 

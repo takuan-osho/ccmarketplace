@@ -93,6 +93,39 @@ export default function () {
 }
 ```
 
+**Ramp-up + steady + ramp-down stages with thresholds:**
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '1m', target: 100 }, // ramp up to 100 VUs
+    { duration: '3m', target: 100 }, // steady at 100 VUs
+    { duration: '1m', target: 0 },   // ramp down to 0
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500'], // p95 latency < 500ms
+    http_req_failed: ['rate<0.01'],   // error rate < 1%
+    checks: ['rate>0.99'],            // 99%+ checks pass
+  },
+};
+
+export default function () {
+  const res = http.get(`${__ENV.BASE_URL || 'https://test.k6.io'}/api/users`);
+  check(res, { 'status is 200': (r) => r.status === 200 });
+  sleep(1);
+}
+```
+
+> Threshold syntax cheatsheet (the most-used metrics):
+> - `http_req_duration: ['p(95)<500']` — 95th percentile under 500ms
+> - `http_req_failed: ['rate<0.01']` — failure rate under 1%
+> - `checks: ['rate>0.99']` — at least 99% of `check()` calls pass
+> - `iteration_duration: ['avg<1000']` — average iteration under 1s
+>
+> Failed `check()` calls do NOT increment `http_req_failed`; that metric only tracks HTTP-level failures (network errors, 5xx). Use `checks` threshold to enforce assertion success rate.
+
 ### 3. Documentation Search Strategy
 
 When searching for specific k6 functionality:

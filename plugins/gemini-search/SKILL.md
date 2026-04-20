@@ -15,11 +15,19 @@ The `gemini` CLI tool must be installed and configured on the system. The Gemini
 
 ## Usage
 
-When web search is needed, execute the Gemini CLI via the Task Tool:
+When web search is needed, execute the Gemini CLI via the Bash tool:
 
 ```bash
 gemini --prompt "WebSearch: <query>"
 ```
+
+### About the `WebSearch:` prefix
+
+The `WebSearch:` prefix inside the prompt is a convention that signals to Gemini that this request requires web grounding rather than answering from training data. Keep it for any search-style query. Without the prefix, Gemini may respond from its training corpus and miss recent information.
+
+## Fallback
+
+If the `gemini` CLI is unavailable (not installed, unauthenticated, or returns a non-zero exit code), fall back to the built-in `WebSearch` tool and report the fallback to the user in one line (e.g., "gemini CLI unavailable, falling back to built-in WebSearch"). Do not silently swallow the failure.
 
 ## Examples
 
