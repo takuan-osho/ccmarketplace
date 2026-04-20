@@ -1,6 +1,6 @@
 ---
 name: tdl
-description: This skill should be used when implementing or improving Traceable Development Lifecycle (TDL) practices in software projects. Use this skill to establish end-to-end traceability from requirements through design, implementation, testing, deployment, and operations. Provides tools, templates, and best practices for ADRs, commit messages, PR templates, structured logging, and traceability analysis.
+description: This skill should be used when implementing or improving Traceable Development Lifecycle (TDL) practices in software projects. Use this skill to establish traceability across the 5-phase workflow (analysis → requirements → ADR → design → implementation). Provides tools, templates, and best practices for ADRs, commit messages, PR templates, structured logging, and traceability analysis as cross-cutting code-integration patterns.
 ---
 
 # Traceable Development Lifecycle (TDL) Skill
