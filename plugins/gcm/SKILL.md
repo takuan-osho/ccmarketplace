@@ -49,6 +49,24 @@ Based on the staged changes analysis, generate an appropriate English commit mes
 - Reason for the changes
 - Impact scope
 - Blank line between subject and body
+- **Wrap each body line at 72 characters** for readability in `git log` and email-style tools
+
+#### Subject Style Conventions
+- Capitalize the first word after the type prefix (e.g., `fix: Reject empty input` not `fix: reject empty input`)
+- Do not end the subject with a period
+- Use the imperative mood (e.g., "Add", "Fix", "Reject" — not "Added", "Fixes")
+
+#### Breaking Changes
+For backward-incompatible changes, mark the commit using either form:
+
+```
+feat!: Drop support for Node 18
+
+BREAKING CHANGE: Node 20+ is now required. CI users must upgrade
+their runtime before pulling this commit.
+```
+
+The `!` after the type and the `BREAKING CHANGE:` footer should both be present so tooling (semantic-release, changelog generators) detects the breaking change.
 
 ### 3. Output Format
 
