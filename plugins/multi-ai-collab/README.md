@@ -42,4 +42,4 @@ Orchestrate multiple AI agents (Codex CLI, Gemini CLI, Claude) with specialized 
 /multi-ai-collab [task description]
 ```
 
-See [SKILL.md](./SKILL.md) for detailed usage instructions.
+See [SKILL.md](./skills/multi-ai-collab/SKILL.md) for detailed usage instructions.

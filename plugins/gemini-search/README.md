@@ -37,4 +37,4 @@ gemini --prompt "WebSearch: OpenAI API rate limits documentation"
 
 ## Details
 
-See [SKILL.md](SKILL.md) for more information.
+See [SKILL.md](skills/gemini-search/SKILL.md) for more information.

@@ -39,4 +39,4 @@ Analyzes staged changes and generates English commit messages in Conventional Co
 
 ## Details
 
-See [SKILL.md](SKILL.md) for detailed guidelines.
+See [SKILL.md](skills/gcm/SKILL.md) for detailed guidelines.

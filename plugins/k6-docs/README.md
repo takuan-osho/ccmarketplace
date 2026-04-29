@@ -44,4 +44,4 @@ export default function () {
 
 ## Details
 
-See [SKILL.md](SKILL.md) for detailed patterns and documentation search strategies.
+See [SKILL.md](skills/k6-docs/SKILL.md) for detailed patterns and documentation search strategies.

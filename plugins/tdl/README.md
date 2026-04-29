@@ -55,4 +55,4 @@ python scripts/trace_status.py --check  # For CI
 
 ## Details
 
-See [SKILL.md](SKILL.md) for detailed workflows and templates.
+See [SKILL.md](skills/tdl/SKILL.md) for detailed workflows and templates.
