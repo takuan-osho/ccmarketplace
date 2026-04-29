@@ -34,4 +34,4 @@ Analyzes differences between the current branch and main branch, generating appr
 
 ## Details
 
-See [SKILL.md](SKILL.md) for detailed workflow.
+See [SKILL.md](skills/create-pr/SKILL.md) for detailed workflow.

@@ -45,4 +45,4 @@ Priority order:
 
 ## Details
 
-See [SKILL.md](SKILL.md) for detailed templates.
+See [SKILL.md](skills/report/SKILL.md) for detailed templates.

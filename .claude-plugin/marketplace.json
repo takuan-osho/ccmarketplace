@@ -10,7 +10,7 @@
     {
       "name": "create-pr",
       "description": "Create Pull Request with automated change analysis and Conventional Commits format",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -19,7 +19,7 @@
     {
       "name": "gcm",
       "description": "Generate Git Commit Message from staged changes following Conventional Commits format",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -28,7 +28,7 @@
     {
       "name": "report",
       "description": "Create structured investigation and analysis reports in GitHub Flavored Markdown",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -37,7 +37,7 @@
     {
       "name": "gemini-search",
       "description": "Web search using Google Gemini CLI tool",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -46,7 +46,7 @@
     {
       "name": "k6-docs",
       "description": "Access Grafana k6 documentation for writing and debugging load testing scripts",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -55,7 +55,7 @@
     {
       "name": "tdl",
       "description": "Implement Traceable Development Lifecycle practices with end-to-end traceability tools",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -64,7 +64,7 @@
     {
       "name": "interview",
       "description": "Conduct structured interviews for requirements gathering, bug investigation, architecture review, and more",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
@@ -73,7 +73,7 @@
     {
       "name": "multi-ai-collab",
       "description": "Orchestrate multiple AI agents (Codex, Gemini, Claude) with specialized personas for cross-review and collaborative development",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "author": {
         "name": "SHIMIZU Taku"
       },
