@@ -63,8 +63,8 @@
     },
     {
       "name": "interview",
-      "description": "Conduct structured interviews for requirements gathering, bug investigation, architecture review, and more",
-      "version": "0.3.1",
+      "description": "Run iterative clarification interviews until Do / Don't do / Done are clear",
+      "version": "0.4.0",
       "author": {
         "name": "SHIMIZU Taku"
       },
