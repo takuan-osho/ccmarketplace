@@ -1,21 +1,14 @@
 # Interview Skill
 
-A skill for conducting structured interviews to gather requirements, clarify specifications, and understand context.
+A skill for conducting iterative interviews that clarify scope, constraints, and acceptance criteria before non-trivial work starts.
 
 ## Overview
 
-This skill provides a structured interview framework to systematically gather information before starting work. It helps reduce ambiguity, ensure comprehensive understanding, and produce actionable outputs.
+This skill helps reduce ambiguity before implementation by walking the user through the decision tree one branch at a time. It follows the `grill-me` pattern: ask one specific question, provide a recommended answer, and keep going until **Do / Don't do / Done** are unambiguous.
 
-## Supported Interview Types
+Use it for vague requests, ambiguous project goals, architecture choices, debugging investigations, documentation planning, or any task where building immediately would risk solving the wrong problem.
 
-| Type | Use Case |
-|------|----------|
-| Requirements | New feature, specification, API design |
-| Investigation | Bug analysis, performance issue, incident |
-| Architecture | Design review, technology selection, refactoring |
-| Security | Security audit, vulnerability assessment |
-| Documentation | Report creation, knowledge transfer |
-| General | Open-ended exploration, brainstorming |
+Skip it for one-line concrete fixes, single-fact questions, or requests that already include scope, constraints, and acceptance criteria.
 
 ## Usage
 
@@ -32,23 +25,34 @@ Examples:
 
 ## Workflow
 
-1. **Phase 1: Preparation** - Codebase exploration, relevant documentation review (silent execution)
-2. **Phase 2: Interview** - Goal confirmation, deep dive questions, priority setting
-3. **Phase 3: Output** - Generate structured summary document
+1. Ask one focused question at a time.
+2. Attach a recommended answer to each question.
+3. If a question can be answered by exploring the codebase, inspect the code instead of asking the user.
+4. Continue until every active branch is accepted, rejected, or explicitly deferred.
+5. Output a concise Markdown summary with **Do**, **Don't do**, and **Done when** sections.
 
 ## Features
 
-- **Environment-Aware Input** - AskUserQuestion tool in Claude Code, numbered options in other environments
-- **Multiple Interview Types** - Question frameworks tailored to the task
-- **Priority Classification** - Must/Should/Could requirement categorization
-- **Output Templates** - Consistent structured documentation
+- **One-question loop** - Avoids batched questions and shallow answers
+- **Recommended defaults** - Lets the user confirm quickly while still surfacing trade-offs
+- **Codebase-aware clarification** - Uses local evidence when the repository can answer the next question
+- **Environment-aware input** - Uses AskUserQuestion in Claude Code when options fit, and numbered options elsewhere
+- **Auto Mode support** - Applies recommended answers without blocking during autonomous runs, marking them with `[auto]`
+- **Focused output** - Produces a small **Do / Don't do / Done when** summary instead of a long requirements document
 
-## References
+## Output Format
 
-- `references/interview-types.md` - Detailed question frameworks per interview type
-- `references/exploration-patterns.md` - Environment-specific codebase exploration commands
-- `references/usage-examples.md` - Detailed usage examples with sample outputs
+```markdown
+### Do
+- <what should be done>
+
+### Don't do
+- <what is out of scope>
+
+### Done when
+- <observable completion condition>
+```
 
 ## Inspiration
 
-This skill is based on [taichi/interview custom command](https://gist.github.com/taichi/8419da7e2b20685db8d5f91f73fc3b1d), extended as a more versatile interview framework.
+This skill is based on [taichi/interview custom command](https://gist.github.com/taichi/8419da7e2b20685db8d5f91f73fc3b1d), adapted toward the local `grill-me` skill's iterative questioning style.
