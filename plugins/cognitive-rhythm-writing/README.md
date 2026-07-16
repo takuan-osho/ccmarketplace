@@ -28,8 +28,12 @@ The skill triggers automatically when generating or revising Japanese expository
 /cognitive-rhythm-writing
 ```
 
-## Source and License
+## Acknowledgments
 
-The skill content is imported from [k16shikano's gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) by Keiichiro Shikano ([@k16shikano](https://github.com/k16shikano)), with one change: the companion-skill reference was converted from a relative path to a skill-name reference so it resolves after plugin installation.
+This skill is the work of Keiichiro Shikano ([@k16shikano](https://github.com/k16shikano)), imported from [the original gist](https://gist.github.com/k16shikano/eb2929f13ed19c97188393d297be8432) with a single change: the companion-skill reference was converted from a relative path to a skill-name reference so it resolves after plugin installation.
 
-The original work is released into the public domain under [the Unlicense](https://gist.github.com/k16shikano/67625f2a7d96e3bbdfae8d571a936063). See [LICENSE](LICENSE).
+These norms distill the author's deep experience with technical writing and editing, and the author generously placed them in the public domain so that anyone can use and build on them. This plugin exists only thanks to that generosity. All credit for the content belongs to the original author, to whom we express our deepest respect and gratitude.
+
+## License
+
+The original work is released into the public domain under the Unlicense. See the author's [license statement](https://gist.github.com/k16shikano/67625f2a7d96e3bbdfae8d571a936063) and [LICENSE](LICENSE) for the links.

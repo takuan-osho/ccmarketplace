@@ -25,8 +25,12 @@ The skill triggers automatically when drafting or revising Japanese technical pr
 /japanese-tech-writing
 ```
 
-## Source and License
+## Acknowledgments
 
-The skill content is imported verbatim from [k16shikano's gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d) by Keiichiro Shikano ([@k16shikano](https://github.com/k16shikano)).
+This skill is the work of Keiichiro Shikano ([@k16shikano](https://github.com/k16shikano)), imported verbatim from [the original gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d).
 
-The original work is released into the public domain under [the Unlicense](https://gist.github.com/k16shikano/67625f2a7d96e3bbdfae8d571a936063). See [LICENSE](LICENSE).
+These norms distill the author's deep experience with technical writing and editing, and the author generously placed them in the public domain so that anyone can use and build on them. This plugin exists only thanks to that generosity. All credit for the content belongs to the original author, to whom we express our deepest respect and gratitude.
+
+## License
+
+The original work is released into the public domain under the Unlicense. See the author's [license statement](https://gist.github.com/k16shikano/67625f2a7d96e3bbdfae8d571a936063) and [LICENSE](LICENSE) for the links.
