@@ -1,0 +1,9 @@
+{
+  "name": "cognitive-rhythm-writing",
+  "description": "Design cognitive rhythm and pacing in Japanese expository writing; use together with japanese-tech-writing",
+  "version": "0.1.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}

@@ -39,3 +39,11 @@ Then browse and install plugins:
 |--------|-------------|
 | [k6-docs](plugins/k6-docs/) | Access Grafana k6 documentation for load testing |
 | [gemini-search](plugins/gemini-search/) | Web search using Google Gemini CLI |
+| [multi-ai-collab](plugins/multi-ai-collab/) | Orchestrate multiple AI agents with specialized personas for cross-review |
+
+### Writing
+
+| Plugin | Description |
+|--------|-------------|
+| [japanese-tech-writing](plugins/japanese-tech-writing/) | Japanese technical writing norms for technical documents and articles |
+| [cognitive-rhythm-writing](plugins/cognitive-rhythm-writing/) | Cognitive rhythm and pacing for Japanese expository writing (use with japanese-tech-writing) |
