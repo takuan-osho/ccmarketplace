@@ -1,0 +1,9 @@
+{
+  "name": "japanese-tech-writing",
+  "description": "Japanese technical writing norms for drafting and revising book chapters, articles, and explanatory documents",
+  "version": "0.1.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}
