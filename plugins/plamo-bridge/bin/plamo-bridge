@@ -1,0 +1,49 @@
+#!/bin/sh
+# Control the local translation servers for plamo-bridge.
+# Usage: plamo-bridge start | stop | status
+#   start   start llama-server (PLaMo 3 Translate) and the translation server in the background if they are not running
+#   stop    stop both servers
+#   status  print whether each server answers its health check
+# The servers keep running after Claude Code exits. Logs: ${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-~/.cache}/plamo-bridge}/logs
+set -eu
+ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+PORT="${PLAMO_BRIDGE_PORT:-8765}"
+LLAMA_PORT="${PLAMO_BRIDGE_LLAMA_PORT:-8766}"
+LOG="${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/plamo-bridge}/logs"
+
+healthy() { curl -sf -o /dev/null --max-time 3 "http://127.0.0.1:$1/health"; }
+state() { if healthy "$1"; then echo up; else echo down; fi; }
+
+case "${1-status}" in
+start)
+  mkdir -p "$LOG"
+  if ! command -v llama-server >/dev/null 2>&1; then
+    echo "plamo-bridge: llama-server not found. Install llama.cpp first (macOS: brew install llama.cpp)." >&2
+    exit 1
+  fi
+  if ! healthy "$LLAMA_PORT"; then
+    LLAMA_PORT="$LLAMA_PORT" nohup "$ROOT/scripts/start-llama.sh" >"$LOG/llama-server.log" 2>&1 &
+  fi
+  if ! healthy "$PORT"; then
+    nohup python3 "$ROOT/scripts/server.py" --port "$PORT" --llama-url "http://127.0.0.1:$LLAMA_PORT" \
+      >"$LOG/server.log" 2>&1 &
+  fi
+  echo "plamo-bridge: servers starting (llama-server :$LLAMA_PORT, translator :$PORT). The first start downloads the model and can take a few minutes."
+  echo "plamo-bridge: target language: ${PLAMO_BRIDGE_TARGET_LANG:-Japanese}, source language: ${PLAMO_BRIDGE_SOURCE_LANG:-English}"
+  ;;
+stop)
+  # Match the ports too, so that servers started by another copy on other ports keep running.
+  pkill -f "scripts/server.py --port $PORT " || true
+  pkill -f "llama-server -hf pfnet/plamo-3-translate.* --port $LLAMA_PORT " || true
+  echo "plamo-bridge: servers stopped"
+  ;;
+status)
+  echo "llama-server :$LLAMA_PORT $(state "$LLAMA_PORT")"
+  echo "translator   :$PORT $(state "$PORT")"
+  echo "logs: $LOG"
+  ;;
+*)
+  echo "usage: plamo-bridge start | stop | status" >&2
+  exit 2
+  ;;
+esac

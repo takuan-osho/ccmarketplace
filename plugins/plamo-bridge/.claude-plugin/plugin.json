@@ -1,0 +1,9 @@
+{
+  "name": "plamo-bridge",
+  "description": "Bridge the language between you and Claude Code: Claude replies in English, and a local PLaMo 3 Translate model shows each reply in your language",
+  "version": "0.1.0",
+  "author": {
+    "name": "SHIMIZU Taku",
+    "email": "shimizu.taku@gmail.com"
+  }
+}

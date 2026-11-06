@@ -47,3 +47,9 @@ Then browse and install plugins:
 |--------|-------------|
 | [japanese-tech-writing](plugins/japanese-tech-writing/) | Japanese technical writing norms for technical documents and articles |
 | [cognitive-rhythm-writing](plugins/cognitive-rhythm-writing/) | Cognitive rhythm and pacing for Japanese expository writing (use with japanese-tech-writing) |
+
+### Translation
+
+| Plugin | Description |
+|--------|-------------|
+| [plamo-bridge](plugins/plamo-bridge/) | Claude replies in English, and a local PLaMo 3 Translate model shows each reply in your language |
