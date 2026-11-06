@@ -71,6 +71,25 @@ class ProtectTest(unittest.TestCase):
         self.assertIn("After.", m)
         self.assertEqual(restore(m, r), t)
 
+    def test_fence_on_list_item_line(self):
+        t = '- ~~~sh\n  echo "Do not translate this literal"\n  ~~~\n\nThen continue.'
+        m, r = protect(t)
+        self.assertNotIn("echo", m)
+        self.assertIn("Then continue.", m)
+        self.assertEqual(restore(m, r), t)
+
+    def test_longer_closing_fence(self):
+        for t in ("~~~sh\necho hello\n~~~~\n\nImportant explanation.", "```sh\nls\n`````\n\nImportant explanation."):
+            with self.subTest(t=t):
+                m, r = protect(t)
+                self.assertIn("Important explanation.", m)
+                self.assertEqual(restore(m, r), t)
+
+    def test_shorter_or_other_closing_fence_does_not_close(self):
+        m, _ = protect("````sh\n```\n~~~~\nstill code\n````\nAfter.")
+        self.assertNotIn("still code", m)
+        self.assertIn("After.", m)
+
     def test_url_trailing_punct_kept_outside(self):
         m, r = protect("Visit https://a.io/x.")
         self.assertEqual(restore(m, r), "Visit https://a.io/x.")
