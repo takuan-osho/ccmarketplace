@@ -11,12 +11,15 @@ PH_FMT = "[[{}{}]]"
 PH_RE = re.compile(r"\[\[[A-Z]\d+\]\]")
 _MARKERS = "XQZJKVWY"
 
-# Fenced code blocks, indented or not (fences inside list items are indented), closed or running to the end.
+# Fenced code blocks, closed or running to the end. A fence line may start with indentation (inside list items)
+# and blockquote markers (inside "> " quotes).
+_LEAD = r"^(?:[ \t]*>)*[ \t]*"
 _FENCE = re.compile(
-    r"^[ \t]*(?P<f>`{3,}|~{3,})[^\n]*\n.*?^[ \t]*(?P=f)[ \t]*$|^[ \t]*(?P<f2>`{3,}|~{3,})[^\n]*\n.*\Z",
+    rf"{_LEAD}(?P<f>`{{3,}}|~{{3,}})[^\n]*\n.*?{_LEAD}(?P=f)[ \t]*$|{_LEAD}(?P<f2>`{{3,}}|~{{3,}})[^\n]*\n.*\Z",
     re.DOTALL | re.MULTILINE,
 )
-_INLINE = re.compile(r"(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)", re.DOTALL)
+# Inline code. It may wrap onto the next line, but it never spans a blank line (a paragraph break).
+_INLINE = re.compile(r"(?<!`)(`+)(?!`)((?:(?!\n[ \t]*\n).)+?)(?<!`)\1(?!`)", re.DOTALL)
 _URL = re.compile(r"\b(?:https?|ftp|file)://[^\s<>\"')\]]+[^\s<>\"')\].,;:!?]")
 # Absolute, ~, ./ and ../ paths; relative paths with at least one slash and a file extension;
 # bare file names with a known extension. Each may end with :line[:col].
@@ -47,6 +50,8 @@ def protect(text: str) -> tuple[str, dict[str, str]]:
         return text, rmap  # every marker is in use: leave the text unmasked rather than risk a collision
 
     def repl(m: re.Match[str]) -> str:
+        if f"[[{marker}" in m.group(0):
+            return m.group(0)  # would contain another placeholder; nested placeholders cannot be restored
         ph = PH_FMT.format(marker, len(rmap))
         rmap[ph] = m.group(0)
         return ph

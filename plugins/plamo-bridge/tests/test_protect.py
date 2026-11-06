@@ -58,6 +58,19 @@ class ProtectTest(unittest.TestCase):
                 self.assertNotIn("echo", m)
                 self.assertEqual(restore(m, r), t)
 
+    def test_no_nested_placeholders(self):
+        t = "The ` character:\n\n```sh\necho hello\n```\n\nUse ` carefully."
+        m, r = protect(t)
+        self.assertFalse(any("[[" in v for v in r.values()))
+        self.assertEqual(restore(m, r), t)
+
+    def test_blockquoted_fence_is_protected(self):
+        t = '> ~~~sh\n> echo "Do not translate this literal"\n> ~~~\n\nAfter.'
+        m, r = protect(t)
+        self.assertNotIn("echo", m)
+        self.assertIn("After.", m)
+        self.assertEqual(restore(m, r), t)
+
     def test_url_trailing_punct_kept_outside(self):
         m, r = protect("Visit https://a.io/x.")
         self.assertEqual(restore(m, r), "Visit https://a.io/x.")
