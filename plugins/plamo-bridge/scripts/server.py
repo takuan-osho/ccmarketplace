@@ -53,7 +53,7 @@ STOPS = ("<|plamo:tag|>", "<|plamo:bos|>")
 LINE_PREFIX = re.compile(r"^(\s*(?:#{1,6}\s+|>\s*|[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+))")
 TABLE_RULE = re.compile(r":?-{2,}:?")
 BLANK_LINES = re.compile(r"(\n\s*\n)")
-WORD = re.compile(r"[A-Za-z]{2,}")
+WORD = re.compile(r"[^\W\d_]{2,}")  # two or more letters in any script
 CONTEXT_LINES = 3
 
 
@@ -145,9 +145,10 @@ class Translator:
         Returns:
             The translated line, or the original line if the translation was cut off or lost a placeholder.
         """
-        prefix = ""
         if m := LINE_PREFIX.match(line):
             prefix, line = m.group(1), line[m.end() :]
+        else:
+            prefix = line[: len(line) - len(line.lstrip())]  # keep the indentation, for nested Markdown
         body = line.strip()
         if not _has_words(body):
             return prefix + body  # only placeholders or symbols
