@@ -1,0 +1,5 @@
+[
+  {"source": "pull request", "target": "プルリクエスト"},
+  {"source": "commit", "target": "コミット"},
+  {"source": "hook", "target": "フック"}
+]

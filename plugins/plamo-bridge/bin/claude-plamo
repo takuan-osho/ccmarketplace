@@ -1,0 +1,16 @@
+#!/bin/sh
+# Start Claude Code with plamo-bridge on from the first message.
+# Claude replies in the source language (English by default), and a MessageDisplay hook shows each reply
+# in the target language (Japanese by default). Global settings are not changed.
+# Usage: claude-plamo [claude args...]      Stop the servers with: plamo-bridge stop
+set -eu
+ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+"$ROOT/bin/plamo-bridge" start >/dev/null
+
+SETTINGS="${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/plamo-bridge}/claude-settings.json"
+mkdir -p "$(dirname "$SETTINGS")"
+cat >"$SETTINGS" <<JSON
+{"hooks": {"MessageDisplay": [{"hooks": [{"type": "command", "command": "$ROOT/scripts/display_translate.py", "timeout": 60}]}]}}
+JSON
+
+exec claude --settings "$SETTINGS" --append-system-prompt-file "$ROOT/prompts/reply-in-source-language.md" "$@"
