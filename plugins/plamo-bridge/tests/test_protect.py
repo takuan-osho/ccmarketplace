@@ -50,6 +50,14 @@ class ProtectTest(unittest.TestCase):
                 m, r = protect(t)
                 self.assertEqual(restore(m, r), t)
 
+    def test_indented_fences_are_one_placeholder(self):
+        for t in ('  ~~~sh\n  echo "Do not translate this literal"\n  ~~~', "- Item\n\n    ```sh\n    ls\n    ```\n"):
+            with self.subTest(t=t):
+                m, r = protect(t)
+                self.assertEqual(len(r), 1)
+                self.assertNotIn("echo", m)
+                self.assertEqual(restore(m, r), t)
+
     def test_url_trailing_punct_kept_outside(self):
         m, r = protect("Visit https://a.io/x.")
         self.assertEqual(restore(m, r), "Visit https://a.io/x.")

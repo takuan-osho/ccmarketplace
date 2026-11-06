@@ -166,9 +166,9 @@ class Translator:
         if body.startswith("|") and body.endswith("|"):
             cells = [c.strip() for c in body.strip("|").split("|")]
             if all(TABLE_RULE.fullmatch(c) for c in cells if c):
-                return body
+                return prefix + body
             translated = [self.translate_line(c, src, tgt, form, context, warnings) if c else c for c in cells]
-            return "| " + " | ".join(translated) + " |"
+            return prefix + "| " + " | ".join(translated) + " |"
         tr, truncated = self._gen(body, src, tgt, form, context)
         if reason := _rejection(body, tr, truncated=truncated):
             warnings.append(f"{reason}, kept the original: {body[:60]!r}")

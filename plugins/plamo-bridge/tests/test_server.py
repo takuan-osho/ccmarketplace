@@ -57,6 +57,10 @@ class LineModeTest(unittest.TestCase):
         self.assertIn("\n    ```sh\n    ls\n    ```\n", out)
         self.assertIn("\n    T:Indented prose.", out)
 
+    def test_indented_table_row_keeps_indentation(self):
+        out, _, _ = self.tr.translate("  | Mode | Speed |\n  |---|---|", mode="line")
+        self.assertEqual(out, "  | T:Mode | T:Speed |\n  |---|---|")
+
     def test_non_latin_prose_is_translated(self):
         for text in ("日本語の文です。", "Это русский текст."):
             with self.subTest(text=text):

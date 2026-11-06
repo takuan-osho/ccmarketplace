@@ -11,8 +11,9 @@ PH_FMT = "[[{}{}]]"
 PH_RE = re.compile(r"\[\[[A-Z]\d+\]\]")
 _MARKERS = "XQZJKVWY"
 
+# Fenced code blocks, indented or not (fences inside list items are indented), closed or running to the end.
 _FENCE = re.compile(
-    r"^(?P<f>`{3,}|~{3,})[^\n]*\n.*?^(?P=f)[ \t]*$|^(?P<f2>`{3,}|~{3,})[^\n]*\n.*\Z",
+    r"^[ \t]*(?P<f>`{3,}|~{3,})[^\n]*\n.*?^[ \t]*(?P=f)[ \t]*$|^[ \t]*(?P<f2>`{3,}|~{3,})[^\n]*\n.*\Z",
     re.DOTALL | re.MULTILINE,
 )
 _INLINE = re.compile(r"(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)", re.DOTALL)

@@ -11,7 +11,7 @@ ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 SETTINGS="${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/plamo-bridge}/claude-settings.json"
 mkdir -p "$(dirname "$SETTINGS")"
 cat >"$SETTINGS" <<JSON
-{"hooks": {"MessageDisplay": [{"hooks": [{"type": "command", "command": "$ROOT/scripts/display_translate.py", "timeout": 60}]}]}}
+{"hooks": {"MessageDisplay": [{"hooks": [{"type": "command", "command": "\"$ROOT/scripts/display_translate.py\"", "timeout": 60}]}]}}
 JSON
 
 exec claude --settings "$SETTINGS" --append-system-prompt-file "$ROOT/prompts/reply-in-source-language.md" "$@"
