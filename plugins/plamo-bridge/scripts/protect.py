@@ -5,9 +5,11 @@ Policy lives in `protect()`. Edit the patterns there to change what is kept.
 
 import re
 
-# Placeholder format. Plain ASCII so the translation model copies it as is.
-PH_FMT = "[[X{}]]"
-PH_RE = re.compile(r"\[\[X(\d+)\]\]")
+# Placeholder format, such as [[X0]]. Plain ASCII so the translation model copies it as is.
+# The letter changes when the text already contains a placeholder-shaped string, so the two cannot collide.
+PH_FMT = "[[{}{}]]"
+PH_RE = re.compile(r"\[\[[A-Z]\d+\]\]")
+_MARKERS = "XQZJKVWY"
 
 _FENCE = re.compile(
     r"^(?P<f>`{3,}|~{3,})[^\n]*\n.*?^(?P=f)[ \t]*$|^(?P<f2>`{3,}|~{3,})[^\n]*\n.*\Z",
@@ -39,9 +41,12 @@ def protect(text: str) -> tuple[str, dict[str, str]]:
         ``restore(masked, rmap)`` reverses the masking.
     """
     rmap: dict[str, str] = {}
+    marker = next((c for c in _MARKERS if f"[[{c}" not in text), None)
+    if marker is None:
+        return text, rmap  # every marker is in use: leave the text unmasked rather than risk a collision
 
     def repl(m: re.Match[str]) -> str:
-        ph = PH_FMT.format(len(rmap))
+        ph = PH_FMT.format(marker, len(rmap))
         rmap[ph] = m.group(0)
         return ph
 
@@ -51,7 +56,9 @@ def protect(text: str) -> tuple[str, dict[str, str]]:
 
 
 def restore(text: str, rmap: dict[str, str]) -> str:
-    """Put the original spans back. Loops so that nested placeholders resolve.
+    """Put the original spans back, in one pass.
+
+    Restored spans are not scanned again, so placeholder-shaped text inside them stays as it is.
 
     Args:
         text: Text that contains placeholders.
@@ -60,9 +67,7 @@ def restore(text: str, rmap: dict[str, str]) -> str:
     Returns:
         The text with every known placeholder replaced by its original span.
     """
-    for _ in range(3):
-        new = PH_RE.sub(lambda m: rmap.get(m.group(0), m.group(0)), text)
-        if new == text:
-            break
-        text = new
-    return text
+    if not rmap:
+        return text
+    keys = re.compile("|".join(re.escape(k) for k in sorted(rmap, key=len, reverse=True)))
+    return keys.sub(lambda m: rmap[m.group(0)], text)

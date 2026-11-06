@@ -60,7 +60,7 @@ def _get(url: str, token: str | None = None) -> tuple[int, bytes]:
         with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=TIMEOUT_S) as r:
             return r.status, r.read()
     except urllib.error.HTTPError as e:
-        return e.code, b""
+        return e.code, e.read()  # keep the body: an unhealthy server (503) still sends its proof
 
 
 def check_server(port: int, token: str) -> int:
