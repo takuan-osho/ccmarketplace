@@ -108,7 +108,8 @@ class Translator:
         with urllib.request.urlopen(self.llama_url + "/health", timeout=3) as r:
             return json.load(r)
 
-    def _gen(self, text: str, src: str, tgt: str, form: str | None, context: str | None) -> str:
+    def _gen(self, text: str, src: str, tgt: str, form: str | None, context: str | None) -> tuple[str, bool]:
+        """Return the translation, and whether it stopped at the token limit (then it is incomplete)."""
         kw: dict[str, object] = {"target_lang": tgt}
         if src:
             kw["source_lang"] = src
@@ -128,12 +129,13 @@ class Translator:
             "max_tokens": max(256, min(8192, len(text) * 2)),
         }
         choice = self._post("/v1/chat/completions", body)["choices"][0]
-        if choice.get("finish_reason") == "length":
+        truncated = choice.get("finish_reason") == "length"
+        if truncated:
             self.stats["truncated"] += 1
         out = choice["message"]["content"] or ""
         for s in STOPS:
             out = out.split(s)[0]
-        return out.strip()
+        return out.strip(), truncated
 
     def translate_line(
         self, line: str, src: str, tgt: str, form: str | None, context: str | None, warnings: list[str]
@@ -141,7 +143,7 @@ class Translator:
         """Translate one line of prose. Keeps the Markdown prefix, and translates table rows cell by cell.
 
         Returns:
-            The translated line, or the original line if a placeholder got lost.
+            The translated line, or the original line if the translation was cut off or lost a placeholder.
         """
         prefix = ""
         if m := LINE_PREFIX.match(line):
@@ -155,7 +157,10 @@ class Translator:
                 return body
             translated = [self.translate_line(c, src, tgt, form, context, warnings) if c else c for c in cells]
             return "| " + " | ".join(translated) + " |"
-        tr = self._gen(body, src, tgt, form, context)
+        tr, truncated = self._gen(body, src, tgt, form, context)
+        if truncated:
+            warnings.append(f"translation cut off at the token limit, kept the original: {body[:60]!r}")
+            return prefix + body
         if not _same_placeholders(body, tr):
             warnings.append(f"placeholder mismatch, kept the original: {body[:60]!r}")
             return prefix + body
@@ -179,8 +184,11 @@ class Translator:
     def _block(
         self, blk: str, src: str, tgt: str, form: str | None, context: str | None, warnings: list[str]
     ) -> str | None:
-        """Translate a multi-line chunk in one request. Returns None if the placeholders do not match."""
-        tr = self._gen(blk, src, tgt, form, context)
+        """Translate a multi-line chunk in one request. Returns None if it was cut off or lost a placeholder."""
+        tr, truncated = self._gen(blk, src, tgt, form, context)
+        if truncated:
+            warnings.append(f"translation cut off at the token limit in a block: {blk[:50]!r}")
+            return None
         if not tr or not _same_placeholders(blk, tr):
             self.stats["mismatches"] += 1
             warnings.append(f"placeholder mismatch in a block: {blk[:50]!r}")
