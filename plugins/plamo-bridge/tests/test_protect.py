@@ -44,6 +44,12 @@ class ProtectTest(unittest.TestCase):
         _m, r = protect("The build and/or the tests failed. I/O is slow.")
         self.assertEqual(r, {})
 
+    def test_placeholder_shaped_text_is_kept(self):
+        for t in ("Use `[[X0]]` as the placeholder.", "Literal [[X0]] in prose, and `code`.", "```\n[[X1]]\n```"):
+            with self.subTest(t=t):
+                m, r = protect(t)
+                self.assertEqual(restore(m, r), t)
+
     def test_url_trailing_punct_kept_outside(self):
         m, r = protect("Visit https://a.io/x.")
         self.assertEqual(restore(m, r), "Visit https://a.io/x.")
