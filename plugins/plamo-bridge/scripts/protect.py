@@ -11,11 +11,15 @@ PH_FMT = "[[{}{}]]"
 PH_RE = re.compile(r"\[\[[A-Z]\d+\]\]")
 _MARKERS = "XQZJKVWY"
 
-# Fenced code blocks, closed or running to the end. A fence line may start with indentation (inside list items)
-# and blockquote markers (inside "> " quotes).
+# Fenced code blocks, closed or running to the end. A fence line may start with indentation and blockquote
+# markers ("> "); an opening fence may also follow a list marker ("- ", "1. "). The closing fence uses the same
+# character as the opening fence, at least as many times.
 _LEAD = r"^(?:[ \t]*>)*[ \t]*"
+_LIST = r"(?:(?:[-*+]|\d+[.)])[ \t]+)?"
+_CLOSE = r"(?P=f)(?:(?<=`)`*|(?<=~)~*)[ \t]*$"
 _FENCE = re.compile(
-    rf"{_LEAD}(?P<f>`{{3,}}|~{{3,}})[^\n]*\n.*?{_LEAD}(?P=f)[ \t]*$|{_LEAD}(?P<f2>`{{3,}}|~{{3,}})[^\n]*\n.*\Z",
+    rf"{_LEAD}{_LIST}(?P<f>`{{3,}}|~{{3,}})[^\n]*\n.*?{_LEAD}{_CLOSE}"
+    rf"|{_LEAD}{_LIST}(?P<f2>`{{3,}}|~{{3,}})[^\n]*\n.*\Z",
     re.DOTALL | re.MULTILINE,
 )
 # Inline code. It may wrap onto the next line, but it never spans a blank line (a paragraph break).
