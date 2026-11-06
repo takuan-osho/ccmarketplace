@@ -40,5 +40,29 @@ class TruncationTest(unittest.TestCase):
         self.assertEqual(second, text.split("\n")[1])
 
 
+class EchoTranslator(Translator):
+    """Answers every request with "T:" and the input."""
+
+    def _post(self, path, body, timeout=600):
+        return {"choices": [{"finish_reason": "stop", "message": {"content": "T:" + body["messages"][0]["content"]}}]}
+
+
+class LineModeTest(unittest.TestCase):
+    def setUp(self):
+        self.tr = EchoTranslator("http://127.0.0.1:1", "token")
+
+    def test_indentation_is_kept(self):
+        text = "- Item\n\n    ```sh\n    ls\n    ```\n\n    Indented prose."
+        out, _, _ = self.tr.translate(text, mode="line")
+        self.assertIn("\n    ```sh\n    ls\n    ```\n", out)
+        self.assertIn("\n    T:Indented prose.", out)
+
+    def test_non_latin_prose_is_translated(self):
+        for text in ("日本語の文です。", "Это русский текст."):
+            with self.subTest(text=text):
+                out, _, _ = self.tr.translate(text, src="ja", tgt="en", mode="line")
+                self.assertEqual(out, "T:" + text)
+
+
 if __name__ == "__main__":
     unittest.main()
