@@ -66,6 +66,17 @@ def _same_placeholders(a: str, b: str) -> bool:
     return sorted(PH_RE.findall(a)) == sorted(PH_RE.findall(b))
 
 
+def _rejection(source: str, translation: str, *, truncated: bool) -> str | None:
+    """Return why a translation must not be shown, or None if it can be shown."""
+    if truncated:
+        return "translation cut off at the token limit"
+    if not translation:
+        return "empty translation"
+    if not _same_placeholders(source, translation):
+        return "placeholder mismatch"
+    return None
+
+
 class Translator:
     """Send masked text to llama-server and check that every placeholder comes back."""
 
@@ -159,11 +170,8 @@ class Translator:
             translated = [self.translate_line(c, src, tgt, form, context, warnings) if c else c for c in cells]
             return "| " + " | ".join(translated) + " |"
         tr, truncated = self._gen(body, src, tgt, form, context)
-        if truncated:
-            warnings.append(f"translation cut off at the token limit, kept the original: {body[:60]!r}")
-            return prefix + body
-        if not _same_placeholders(body, tr):
-            warnings.append(f"placeholder mismatch, kept the original: {body[:60]!r}")
+        if reason := _rejection(body, tr, truncated=truncated):
+            warnings.append(f"{reason}, kept the original: {body[:60]!r}")
             return prefix + body
         return prefix + tr
 

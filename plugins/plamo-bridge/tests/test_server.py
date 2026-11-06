@@ -64,5 +64,20 @@ class LineModeTest(unittest.TestCase):
                 self.assertEqual(out, "T:" + text)
 
 
+class EmptyTranslator(Translator):
+    """Answers every request with an empty translation."""
+
+    def _post(self, path, body, timeout=600):
+        return {"choices": [{"finish_reason": "stop", "message": {"content": "<|plamo:tag|>"}}]}
+
+
+class EmptyTranslationTest(unittest.TestCase):
+    def test_empty_translation_keeps_the_original(self):
+        text = "Important explanation.\nDo not delete your data."
+        out, warnings, _ = EmptyTranslator("http://127.0.0.1:1", "token").translate(text)
+        self.assertEqual(out, text)
+        self.assertTrue(any("empty translation" in w for w in warnings))
+
+
 if __name__ == "__main__":
     unittest.main()
