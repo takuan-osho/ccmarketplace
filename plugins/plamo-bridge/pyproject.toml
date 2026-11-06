@@ -1,0 +1,33 @@
+# Tool settings for the plugin's Python scripts. The scripts use only the standard library;
+# nothing here is installed. Checks:
+#   uvx ruff check . && uvx ruff format --check . && uvx ty check
+#   python3 -m unittest discover -s tests
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RET", "PTH", "PIE", "PL", "RUF",
+    "ANN", "D", "BLE", "FURB", "PERF", "S", "TRY", "EM", "ISC", "Q",
+]
+ignore = [
+    "D203", "D213",          # conflict with D211 and D212; use the common pair D211 + D212
+    "PLR0913", "PLR0917",    # translation calls carry several small options
+    "S310",                  # urlopen targets fixed http://127.0.0.1 URLs only
+    "TRY003", "EM101", "EM102",
+    "ISC001",                # conflicts with the formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "ANN", "S101", "PT"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ty.environment]
+python-version = "3.14"
+extra-paths = ["scripts"]
+
+[tool.ty.src]
+include = ["scripts", "tests"]
