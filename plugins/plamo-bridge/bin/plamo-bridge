@@ -16,7 +16,7 @@ CACHE="${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/plamo-bridge}"
 LOG="$CACHE/logs"
 TOKEN="$CACHE/token"
 RUN="$CACHE/run"
-AUTH="python3 $ROOT/scripts/auth.py"
+auth() { python3 "$ROOT/scripts/auth.py" "$@"; }
 
 # Prints "ours", "down", "foreign", or "loading" for a server ($1: check-server or check-llama, $2: port).
 state() {
@@ -25,7 +25,7 @@ state() {
     return
   fi
   set +e
-  $AUTH "$1" "$2" "$TOKEN"
+  auth "$1" "$2" "$TOKEN"
   rc=$?
   set -e
   case $rc in 0) echo ours ;; 1) echo down ;; 3) echo loading ;; *) echo foreign ;; esac
@@ -60,7 +60,7 @@ start)
     echo "plamo-bridge: python3 3.14 or later is required (found $(python3 -V 2>&1))." >&2
     exit 1
   fi
-  $AUTH init "$TOKEN"
+  auth init "$TOKEN"
   case "$(state check-llama "$LLAMA_PORT")" in
   foreign) foreign "$LLAMA_PORT" PLAMO_BRIDGE_LLAMA_PORT ;;
   down)

@@ -6,7 +6,7 @@ hooks:
   MessageDisplay:
     - hooks:
         - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/scripts/display_translate.py"
+          command: '"${CLAUDE_PLUGIN_ROOT}/scripts/display_translate.py"'
           timeout: 60
 ---
 
