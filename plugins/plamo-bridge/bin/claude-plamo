@@ -4,6 +4,7 @@
 # in the target language (Japanese by default). Global settings are not changed.
 # Usage: claude-plamo [claude args...]      Stop the servers with: plamo-bridge stop
 set -eu
+umask 077
 ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 "$ROOT/bin/plamo-bridge" start >/dev/null
 

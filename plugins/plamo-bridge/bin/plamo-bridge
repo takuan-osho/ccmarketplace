@@ -3,43 +3,92 @@
 # Usage: plamo-bridge start | stop | status
 #   start   start llama-server (PLaMo 3 Translate) and the translation server in the background if they are not running
 #   stop    stop both servers
-#   status  print whether each server answers its health check
-# The servers keep running after Claude Code exits. Logs: ${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-~/.cache}/plamo-bridge}/logs
+#   status  print the state of each server
+# The servers keep running after Claude Code exits.
+# Both servers require a shared token kept in "$CACHE/token" (see scripts/auth.py). Everything in "$CACHE"
+# is readable by the current user only.
 set -eu
+umask 077
 ROOT="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 PORT="${PLAMO_BRIDGE_PORT:-8765}"
 LLAMA_PORT="${PLAMO_BRIDGE_LLAMA_PORT:-8766}"
-LOG="${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/plamo-bridge}/logs"
+CACHE="${PLAMO_BRIDGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/plamo-bridge}"
+LOG="$CACHE/logs"
+TOKEN="$CACHE/token"
+RUN="$CACHE/run"
+AUTH="python3 $ROOT/scripts/auth.py"
 
-healthy() { curl -sf -o /dev/null --max-time 3 "http://127.0.0.1:$1/health"; }
-state() { if healthy "$1"; then echo up; else echo down; fi; }
+# Prints "ours", "down", "foreign", or "loading" for a server ($1: check-server or check-llama, $2: port).
+state() {
+  if [ ! -f "$TOKEN" ]; then
+    echo down
+    return
+  fi
+  set +e
+  $AUTH "$1" "$2" "$TOKEN"
+  rc=$?
+  set -e
+  case $rc in 0) echo ours ;; 1) echo down ;; 3) echo loading ;; *) echo foreign ;; esac
+}
+
+# Stops the process in pid file $1, but only if its command line still contains $2.
+# This avoids stopping an unrelated process that got the same PID later.
+stop_pid() {
+  [ -f "$1" ] || return 0
+  pid="$(cat "$1")"
+  cmd="$(ps -p "$pid" -o command= 2>/dev/null || true)"
+  case "$cmd" in
+  *"$2"*) kill "$pid" ;;
+  esac
+  rm -f "$1"
+}
+
+foreign() {
+  echo "plamo-bridge: port $1 is used by another program, not by plamo-bridge. Stop it, or set $2 to a free port." >&2
+  exit 1
+}
 
 case "${1-status}" in
 start)
-  mkdir -p "$LOG"
+  mkdir -p "$LOG" "$RUN"
+  chmod 700 "$CACHE" "$LOG" "$RUN"
   if ! command -v llama-server >/dev/null 2>&1; then
     echo "plamo-bridge: llama-server not found. Install llama.cpp first (macOS: brew install llama.cpp)." >&2
     exit 1
   fi
-  if ! healthy "$LLAMA_PORT"; then
-    LLAMA_PORT="$LLAMA_PORT" nohup "$ROOT/scripts/start-llama.sh" >"$LOG/llama-server.log" 2>&1 &
+  if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 14))'; then
+    echo "plamo-bridge: python3 3.14 or later is required (found $(python3 -V 2>&1))." >&2
+    exit 1
   fi
-  if ! healthy "$PORT"; then
+  $AUTH init "$TOKEN"
+  case "$(state check-llama "$LLAMA_PORT")" in
+  foreign) foreign "$LLAMA_PORT" PLAMO_BRIDGE_LLAMA_PORT ;;
+  down)
+    LLAMA_PORT="$LLAMA_PORT" nohup "$ROOT/scripts/start-llama.sh" --api-key-file "$TOKEN" \
+      >"$LOG/llama-server.log" 2>&1 &
+    echo $! >"$RUN/llama-server.pid"
+    ;;
+  esac
+  case "$(state check-server "$PORT")" in
+  foreign) foreign "$PORT" PLAMO_BRIDGE_PORT ;;
+  down)
     nohup python3 "$ROOT/scripts/server.py" --port "$PORT" --llama-url "http://127.0.0.1:$LLAMA_PORT" \
-      >"$LOG/server.log" 2>&1 &
-  fi
+      --token-file "$TOKEN" >"$LOG/server.log" 2>&1 &
+    echo $! >"$RUN/server.pid"
+    ;;
+  esac
   echo "plamo-bridge: servers starting (llama-server :$LLAMA_PORT, translator :$PORT). The first start downloads the model and can take a few minutes."
   echo "plamo-bridge: target language: ${PLAMO_BRIDGE_TARGET_LANG:-Japanese}, source language: ${PLAMO_BRIDGE_SOURCE_LANG:-English}"
   ;;
 stop)
-  # Match the ports too, so that servers started by another copy on other ports keep running.
-  pkill -f "scripts/server.py --port $PORT " || true
-  pkill -f "llama-server -hf pfnet/plamo-3-translate.* --port $LLAMA_PORT " || true
+  # Stop only the processes that this script started, recorded in "$RUN".
+  stop_pid "$RUN/server.pid" "$ROOT/scripts/server.py"
+  stop_pid "$RUN/llama-server.pid" "llama-server -hf pfnet/plamo-3-translate"
   echo "plamo-bridge: servers stopped"
   ;;
 status)
-  echo "llama-server :$LLAMA_PORT $(state "$LLAMA_PORT")"
-  echo "translator   :$PORT $(state "$PORT")"
+  echo "llama-server :$LLAMA_PORT $(state check-llama "$LLAMA_PORT")"
+  echo "translator   :$PORT $(state check-server "$PORT")"
   echo "logs: $LOG"
   ;;
 *)

@@ -17,7 +17,7 @@ Only the display changes. The transcript, and what Claude reads in later turns, 
 
 ## Requirements
 
-- macOS or Linux, with `python3` (standard library only) and `curl`
+- macOS or Linux, with Python 3.14 or later as `python3` (standard library only)
 - llama.cpp's `llama-server` on your `PATH` (macOS: `brew install llama.cpp`)
 - About 550 MB of disk space for the model. `llama-server` downloads it on first start into the Hugging Face cache.
 - About 0.8 GB of memory while the servers run
@@ -55,7 +55,7 @@ Use either `claude-plamo` or `/plamo-bridge` in a session, not both. Both regist
 
 ### Manage the servers
 
-The servers keep running after Claude Code exits.
+The servers keep running after Claude Code exits. `stop` stops only the processes that `start` recorded.
 
 ```sh
 bin/plamo-bridge status
@@ -73,9 +73,26 @@ Set these environment variables before you start Claude Code:
 | `PLAMO_MODEL` | `0.8b` | Model size: `0.8b` or `2b` |
 | `PLAMO_BRIDGE_PORT` | `8765` | Port of the translation server |
 | `PLAMO_BRIDGE_LLAMA_PORT` | `8766` | Port of `llama-server` |
-| `PLAMO_BRIDGE_CACHE` | `${XDG_CACHE_HOME:-~/.cache}/plamo-bridge` | Message buffers and logs |
+| `PLAMO_BRIDGE_CACHE` | `${XDG_CACHE_HOME:-~/.cache}/plamo-bridge` | Token, message buffers, process IDs, and logs |
 
 PLaMo 3 Translate supports 53 languages. The skill and `claude-plamo` always ask Claude to write in English. If you change `PLAMO_BRIDGE_SOURCE_LANG`, change that instruction too.
+
+## Security
+
+The servers listen on `127.0.0.1` only. Both local connections use one shared token:
+
+- The hook sends the token to the translation server, which rejects requests without it.
+- The translation server sends the same token to `llama-server`, which runs with `--api-key-file`.
+- `start` checks that a server already on a port proves that it knows the token, without the token being sent. If another program uses the port, `start` stops with an error and does not touch that program.
+
+The token is created once, in `token` in the cache folder, and reused, because the servers keep running between sessions. Everything in the cache folder is readable by your user only (folders `0700`, files `0600`).
+
+What this protects against: other users on the same machine. What it does not protect against:
+
+- Programs that run as your own user. They can read the token file, like the hook does.
+- A program that takes the port before the servers start, while a session is running. The hook does not check the server before it sends a reply, so such a program receives the reply text and the token. `start` reports the port conflict the next time it runs.
+
+The plugin is designed for a single-user machine. It does not limit request size or the number of requests.
 
 ## Measurements
 
@@ -101,6 +118,7 @@ The 2B model made fewer meaning errors in technical text (1 against 3 in the sam
 |------|---------|
 | `skills/plamo-bridge/SKILL.md` | The `/plamo-bridge` skill. Registers the hook and starts the servers |
 | `bin/plamo-bridge` | Starts, stops, and checks the servers |
+| `scripts/auth.py` | Creates the shared token and checks whether a server on a port is ours |
 | `bin/claude-plamo` | Launcher that starts Claude Code with the bridge on |
 | `prompts/reply-in-source-language.md` | English-reply instruction used by `claude-plamo` |
 | `scripts/display_translate.py` | The `MessageDisplay` hook |
@@ -109,6 +127,7 @@ The 2B model made fewer meaning errors in technical text (1 against 3 in the sam
 | `scripts/yarn_args.py` | Computes the YaRN values used by `start-llama.sh` |
 | `scripts/glossary.example.json` | Example glossary for `server.py --glossary` |
 | `tests/` | Unit tests. Run `python3 -m unittest discover -s tests` from this folder |
+| `pyproject.toml` | Settings for the development checks: `uvx ruff check .`, `uvx ruff format --check .`, and `uvx ty check` |
 
 ## YaRN workaround
 

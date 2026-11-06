@@ -1,9 +1,10 @@
-"""Run with: python3 -m unittest discover -s tests  (from the plugin root)   (pytest also works)."""
-import pathlib
+"""Tests for protect.py. Run from the plugin root: python3 -m unittest discover -s tests (pytest also works)."""
+
 import sys
 import unittest
+from pathlib import Path
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 from protect import protect, restore
 
 CASES = [
