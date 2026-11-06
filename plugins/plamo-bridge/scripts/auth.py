@@ -78,19 +78,22 @@ def check_server(port: int, token: str) -> int:
 
 
 def check_llama(port: int, token: str) -> int:
-    """Return OURS if llama-server on the port rejects requests without the token and accepts ours."""
+    """Return OURS if llama-server on the port accepts our token and rejects no token and a wrong token.
+
+    A server that accepts any Authorization header fails this check. llama-server cannot prove that it knows the
+    token, so a program that copies llama-server's answers for these three requests can still pass.
+    """
     base = f"http://127.0.0.1:{port}/v1/models"
     try:
         without, _ = _get(base)
+        wrong, _ = _get(base, secrets.token_hex(32))
+        ours, _ = _get(base, token)
     except OSError:
         return DOWN
-    try:
-        with_token, _ = _get(base, token)
-    except OSError:
-        return DOWN
-    if without == with_token == HTTPStatus.SERVICE_UNAVAILABLE:
+    if without == wrong == ours == HTTPStatus.SERVICE_UNAVAILABLE:
         return LOADING  # llama-server answers 503 to every request until the model is loaded
-    return OURS if without == HTTPStatus.UNAUTHORIZED and with_token == HTTPStatus.OK else FOREIGN
+    rejected = without == wrong == HTTPStatus.UNAUTHORIZED
+    return OURS if rejected and ours == HTTPStatus.OK else FOREIGN
 
 
 def main() -> int:
