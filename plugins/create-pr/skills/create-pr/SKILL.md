@@ -150,9 +150,9 @@ Generate a description that provides the minimum prerequisite knowledge for revi
 ### 4. Create PR
 
 ```bash
-# Verify main branch is up to date
+# Verify the base branch chosen in step 2 is up to date
 echo -e "\n=== Checking remote status ==="
-git fetch origin main
+git fetch origin <base>
 
 # Check if branch exists on remote
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -165,7 +165,7 @@ fi
 
 # Create PR
 echo -e "\n=== Creating Pull Request ==="
-gh pr create --base main --title "<generated title>" --body "$(cat <<'EOF'
+gh pr create --base <base> --title "<generated title>" --body "$(cat <<'EOF'
 <generated description>
 EOF
 )"
